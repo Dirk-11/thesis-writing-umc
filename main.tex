@@ -1,0 +1,114 @@
+% Master Thesis LaTeX Template
+% Collaboration: VU Amsterdam, University of Amsterdam (UvA), DTU Denmark
+
+\documentclass[12pt,twocolumn]{article}
+
+\usepackage[numbers,sort&compress]{natbib}
+% Encoding and Language
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+
+% Page Layout and Spacing
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{setspace}
+\onehalfspacing
+
+% Graphics and Logos
+\usepackage{graphicx}
+\usepackage{float}
+
+% Hyperlinks
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+%----------------------------------------------------------------------------------------
+% DOCUMENT INFORMATION
+%----------------------------------------------------------------------------------------
+\title{\bfseries Title of Your Master Thesis}
+\author{Your Name}
+\date{\today}
+
+%----------------------------------------------------------------------------------------
+% BEGIN DOCUMENT
+%----------------------------------------------------------------------------------------
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+% TITLE PAGE
+%----------------------------------------------------------------------------------------
+\begin{titlepage}
+  \centering
+  % Logos: place your logo files in a 'logos/' folder
+\begin{figure}[H]
+  \centering
+  % first logo
+  \begin{minipage}[c]{0.30\linewidth}
+    \includegraphics[height=1.4cm]{figures/logo/vu-griffioen.pdf}
+  \end{minipage}
+  \hfill
+  % second logo
+  \begin{minipage}[c]{0.38\linewidth}
+    \centering
+    \includegraphics[height=1cm]{figures/logo/Logo_Amsterdam_UMC_(NL).png}
+  \end{minipage}
+  \hfill
+  % third logo
+  \begin{minipage}[c]{0.3\linewidth} \hfill
+    \includegraphics[height=1cm]{figures/logo/uvalogo_regular_compact_p_nl.jpg}
+  \end{minipage}
+  \label{fig:three-logos}
+\end{figure}
+  
+  \vspace{1.5cm}
+  {\LARGE \textbf{Exploratory Proteomics Study of Gestational Alloimmune Liver Disease (GALD)}\\}
+  \vspace{0.5cm}
+  \vspace{2cm}
+  {\large \textbf{Author:} Dirk de Boer\\ \textbf{Student number}: 2663349} \\
+  \vspace{0.5cm}
+  {\large \textbf{Supervisors:} Prof. O. Lund (DTU), Carolina Barra Quaglia, PhD. (DTU)\\}
+  {\large \textbf{Examiner:} Dr. Solon Pissis (VU)\\}
+  \vfill
+  {\large The work of this thesis was carried out at the Technical University of Denmark (DTU), Department of Health Technology, Bioinformatics section.}
+  \vfill
+  {\large A Master’s Thesis submitted to the Faculty of Science\\
+  in partial fulfillment of the requirements for the degree of \\
+  Bioinformatics \& Systems Biology\\}
+  
+  \vspace{0.5cm}
+  {\large Course ID: XM\_0103 Major Research Project\\30 ECTS\\}
+  \vspace{1cm}
+  {\large \today}
+\end{titlepage}
+
+%----------------------------------------------------------------------------------------
+% ABSTRACT
+%----------------------------------------------------------------------------------------
+\twocolumn[
+\begin{@twocolumnfalse}
+\begin{abstract}
+Gestational Alloimmune Liver Disease (GALD) is a severe fetal liver injury caused by maternal IgG. Although clinical evidence supports an alloimmune mechanism, the specific antigen responsible is still unknown. This thesis investigates whether proteomic profiling of maternal plasma and fetal liver IgG immunoprecipitations can reveal proteins, peptides, or pathways associated with GALD.
+
+Two externally preprocessed datasets from the Proteomics Research Infrastructure (PRI) were analysed: (i) maternal plasma proteomes from GALD and control pregnancies, and (ii) fetal liver immunoprecipitations using purified maternal IgG. Protein- and peptide-level quantification, presence/absence analysis, differential abundance testing, and gene-set enrichment were performed.
+
+In maternal plasma, classical complement pathways showed enrichment, and a N-linked glycosylation pathway was significantly upregulated. In fetal liver pulldowns, thirteen proteins were detected exclusively in GALD samples. The peptide data was surprisingly different from the protein data, caused by the complex filtering and thresholding from Maxquant. In maternal plasma, glycosylation pathways were enriched alongside complement activation, while fetal liver analysis revealed cytoskeletal, metabolic, and mitochondrial themes.
+
+Although no specific antigen was identified, the results provide a framework and a starting point for future studies to GALD.
+\end{abstract}
+\end{@twocolumnfalse}
+]
+%----------------------------------------------------------------------------------------
+% MAIN CONTENT
+%----------------------------------------------------------------------------------------
+\end{document}
