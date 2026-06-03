@@ -131,190 +131,178 @@ Although no specific antigen was identified, the results provide a framework and
 
 
 % ============================================================
+% ============================================================
+%  MOCKI Thesis – Introduction & Methods (v3 — GALD voice)
+%  Author: Dirk de Boer
+% ============================================================
+
+
+% ============================================================
 \section*{Introduction}
 % ============================================================
 
 \subsection*{Kidney stone disease and the importance of composition}
 
-Kidney stone disease is one of the most common urological conditions worldwide, with incidence rates ranging from 1\% in parts of Asia to 13\% in North America, and a global trend of rising prevalence over the past three decades \cite{Türk2022, Qian2022, Sorokin2017, Stamatelou2023}. In 2021 alone, an estimated 106 million new cases were recorded globally \cite{Qian2022}. The condition causes substantial morbidity through acute renal colic, recurrent urinary tract infections, and potential long-term renal damage. Recurrence rates are high---up to 50\% of patients experience a second episode within ten years---and the financial burden on healthcare systems is considerable.
+Kidney stone disease is one of the most common urological conditions worldwide, with incidence rates ranging from 1\% in parts of Asia to 13\% in North America and a global trend of rising prevalence over the past three decades \cite{Türk2022, Qian2022, Sorokin2017, Stamatelou2023}. In 2021 alone, an estimated 106 million new cases were recorded globally \cite{Qian2022}. Recurrence rates are high---up to 50\% of patients experience a second episode within ten years---and the associated morbidity, from acute renal colic to long-term kidney damage, places a substantial burden on healthcare systems.
 
-Effective prevention of stone recurrence requires knowing the mineralogical composition of the stone. Different compositions reflect distinct metabolic processes, and treatment decisions---such as dietary modification, urine alkalinisation, or targeted pharmacotherapy---depend directly on this information \cite{Daudon2016, Corrales2021}. The reference method for compositional analysis is Fourier transform infrared spectroscopy (FTIR), which accurately identifies the chemical nature and relative proportions of mineral components in a stone \cite{Basiri2025, Daudon2016}. Despite its accuracy, FTIR analysis is performed ex vivo after stone retrieval and requires specialised laboratory equipment and personnel. Results typically take days to weeks to return to the clinic, limiting its utility for immediate clinical decision-making.
+Preventing recurrence requires knowing what the stone is made of. Different mineral compositions reflect different underlying metabolic disorders, and treatment decisions---dietary modification, urine alkalinisation, or pharmacotherapy---depend directly on this information \cite{Daudon2016, Corrales2021}. The reference method for compositional analysis is Fourier transform infrared spectroscopy (FTIR), which can accurately identify the chemical nature and relative proportions of each mineral component \cite{Basiri2025, Daudon2016}. However, FTIR is performed ex vivo after the stone has been retrieved and requires specialised laboratory equipment and trained personnel. Results typically take days to weeks to reach the clinician, limiting its utility for timely treatment decisions.
 
-\subsection*{Visual recognition of kidney stones}
+\subsection*{Towards automated visual recognition}
 
-An alternative to laboratory-based analysis is direct visual inspection of the stone, which clinicians with extensive training can use to estimate composition from surface morphology, texture, and colour. This approach, known as endoscopic stone recognition (ESR), has been formalised in the morpho-constitutional classification system described by Daudon and colleagues, which distinguishes six major stone types (I--VI) based on their crystalline structure \cite{Daudon2016, Corrales2021}. However, ESR requires years of expertise and is poorly reproducible across observers \cite{Randall2023}, making it unsuitable for routine clinical practice.
+An alternative is to estimate composition from the stone's visual appearance. Clinicians with extensive training can infer composition from surface morphology, texture, and colour---an approach known as endoscopic stone recognition (ESR), formalised in the Daudon morpho-constitutional classification system \cite{Daudon2016, Corrales2021}. In practice, however, ESR requires years of experience and shows poor agreement between observers \cite{Randall2023}, which makes it unsuitable for routine use.
 
-Deep learning offers a path to automating visual stone recognition. Several groups have demonstrated that convolutional neural networks (CNNs) trained on endoscopic or ex vivo photographs can distinguish between major stone types with reasonable accuracy. Black et al. showed in an early pilot study that CNNs could predict kidney stone composition from digital photographs \cite{Black2020}. The group of Ochoa-Ruiz and Daul has been particularly active in this space, exploring CNN-based classification, two-step transfer learning, metric learning, and few-shot approaches on in vivo ureteroscopic images \cite{LopezTiro2021, LopezTiro2024, GonzalezZapata2024}. Estrade and colleagues assessed automatic recognition of pure and mixed stone morphologies using intraoperative endoscopic images and videos, confirming the feasibility of the approach in a clinical setting \cite{Estrade2022, Estrade2022video}. Kim et al. demonstrated that deep learning models trained on digital photographs of extracted stones could predict the presence of individual mineral components with reasonable recall \cite{Kim2022}. More recently, Serrat et al. proposed MyStone, an automatic classification system for expelled kidney stones \cite{Serrat2017}, Zhu et al. trained machine learning models on intraoperative endoscopic images to predict composition in real time \cite{Zhu2024}, Leng et al. developed UroSAM, combining segmentation and classification from endoscopic video \cite{Leng2024}, and Onal and Tekgul explored smartphone microscopy with deep neural networks \cite{Onal2022}. El Beze et al. provided a comprehensive evaluation of automated urinary stone recognition methods \cite{ElBeze2022}.
+This is where deep learning becomes relevant. Over the past five years, several groups have shown that convolutional neural networks (CNNs) can classify kidney stone types from photographs with reasonable accuracy. Most of this work has focused on in vivo endoscopic images: the group of Ochoa-Ruiz and Daul explored CNN-based classification, two-step transfer learning, and metric learning on ureteroscopic images \cite{LopezTiro2021, LopezTiro2024, GonzalezZapata2024}, while Estrade and colleagues demonstrated recognition of pure and mixed stone morphologies from both still images and video \cite{Estrade2022, Estrade2022video}. Other groups have worked with ex vivo photographs taken after stone extraction: Black et al. were among the first to apply deep learning to this setting \cite{Black2020}, Kim et al. predicted the presence of individual mineral components \cite{Kim2022}, and Serrat et al. built an automated classification pipeline for expelled stones \cite{Serrat2017}. More recently, Zhu et al. trained models on intraoperative images for real-time composition prediction \cite{Zhu2024}, Leng et al. combined segmentation and classification from endoscopic video \cite{Leng2024}, and Onal and Tekgul explored smartphone-based microscopy \cite{Onal2022}. A comprehensive benchmark of these approaches was provided by El Beze et al. \cite{ElBeze2022}.
 
-\subsection*{Limitations of prior work}
+\subsection*{The gap: classification vs. continuous composition}
 
-Despite these encouraging results, all prior work frames the problem as a \textit{classification} task. Stones are assigned to a fixed category---either a single mineral type or a predefined combination of types from the Daudon classification system---and the model outputs a discrete label. This formulation discards an important dimension of the data: the continuous mineralogical composition measured by FTIR. Most kidney stones are in fact mixtures of two or more mineral components, and the relative proportions of these components carry clinically meaningful information \cite{Daudon2016}. A stone that is 90\% calcium oxalate monohydrate (COM) with 10\% calcium phosphate (CaP) has a different aetiological interpretation than one that is 60\% COM and 40\% CaP, yet both would receive the same categorical label in existing classification systems.
+Despite this progress, all existing approaches frame the problem as a \textit{classification} task. The model assigns each stone to a fixed category---a single mineral type or a predefined mixture type from the Daudon system---and outputs a discrete label. This formulation discards an important part of the clinical picture: the continuous mineralogical composition measured by FTIR.
 
-To our knowledge, no prior study has attempted to predict continuous FTIR-calibrated mineral composition percentages directly from stone photographs. This gap motivates the present work.
+Most kidney stones are in fact mixtures of two or more minerals, and the relative proportions matter clinically \cite{Daudon2016}. A stone that is 90\% calcium oxalate monohydrate (COM) with 10\% calcium phosphate (CaP) suggests a different metabolic profile than one that is 60\% COM and 40\% CaP, yet both would receive the same label under existing classification systems. To our knowledge, no prior study has attempted to predict continuous FTIR-calibrated mineral composition percentages directly from stone photographs. This gap motivates the present work.
 
-\subsection*{Research question and aims}
+\subsection*{Research question}
 
-The overall aim of this thesis is to investigate whether deep learning models trained on ex vivo kidney stone photographs can predict the continuous mineral composition of kidney stones, as calibrated by FTIR spectroscopy.
+The central question of this thesis is: \textit{can a deep learning model predict the continuous mineral composition of a kidney stone from its ex vivo photograph, as calibrated by FTIR spectroscopy?}
 
-This main question is addressed through two subsidiary aims:
+We address this through two sub-questions:
 
 \begin{enumerate}
     \item How accurately can a binary classifier distinguish pure from mixed stones based on visual features alone?
-    \item How well does a compositional regression model predict the dominant mineral class compared to a direct multiclass classifier trained on the same data?
+    \item How well does a compositional regression model predict the dominant mineral class compared to a conventional multiclass classifier trained on the same data?
 \end{enumerate}
 
-The ex vivo setting---photographs taken immediately after stone retrieval, outside the body---represents a necessary and deliberate first step. Prior work from this group established ex vivo image acquisition as a reproducible protocol and demonstrated the feasibility of mineral class discrimination on this dataset \cite{veltheer2025}. The present work builds on that foundation by replacing discrete classification with continuous compositional prediction and by directly benchmarking the regression approach against a conventional multiclass model.
+We work with ex vivo photographs---taken immediately after stone retrieval, outside the body---as a deliberate first step before tackling the harder in vivo endoscopic setting. Prior work from this group established this imaging protocol and demonstrated that mineral class discrimination is feasible on this dataset \cite{veltheer2025}. The present study builds on that foundation by replacing discrete classification with continuous compositional prediction.
 
 
 % ============================================================
 \section*{Methods}
 % ============================================================
 
-\subsection*{Overview of study design}
+\subsection*{Study design}
 
-This study trained and evaluated three deep learning models on a dataset of ex vivo kidney stone photographs with FTIR-calibrated mineral composition labels. The models address complementary aspects of the composition profiling problem: a binary classifier distinguishing pure from mixed stones (Model A), a compositional regression model predicting continuous mineral percentages (Model B), and a multiclass classifier predicting the dominant mineral class (Model C). All models share the same ResNet18 backbone \cite{He2016} and staged fine-tuning procedure; differences lie in the output head, loss function, and target representation. The full pipeline is config-driven and publicly available at \url{https://github.com/Dirkdeboer/umc_thesis}. Figure~\ref{fig:workflow} gives a schematic overview of the study design.
+We trained and compared three deep learning models, each addressing a different aspect of the composition profiling problem (Figure~\ref{fig:workflow}):
 
-% TODO: create and insert workflow figure
+\begin{itemize}
+    \item \textbf{Model A}: a binary classifier that distinguishes pure from mixed stones,
+    \item \textbf{Model B}: a compositional regression model that predicts continuous mineral percentages,
+    \item \textbf{Model C}: a multiclass classifier that predicts the dominant mineral class.
+\end{itemize}
+
+All three models share the same backbone architecture and training procedure; they differ only in their output head and loss function. This design allows a controlled comparison: Model B and Model C can both be evaluated on dominant class prediction, isolating the effect of the regression framing. The full pipeline is config-driven and publicly available at \url{https://github.com/Dirkdeboer/umc_thesis}.
+
+% TODO: uncomment when workflow figure is placed
 \begin{figure*}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/workflow_v3_3.png}
-    \caption{\textbf{Overview of the study design.} ...}
+    \includegraphics[width=0.7\textwidth]{figures/workflow_v3_3.png}
+    \caption{Overview of the study design.}
     \label{fig:workflow}
 \end{figure*}
 
 \subsection*{Dataset}
 
-\subsubsection*{Stone collection and imaging}
+The dataset consists of 423 kidney stone fragments collected at Amsterdam UMC (VUmc) as part of the MOCKI study. Each fragment was photographed ex vivo immediately after retrieval, yielding three photographs per stone (1269 images total). Stones were placed on a black background and photographed under controlled lighting with a digital camera. Two stones were excluded due to missing FTIR labels, and a further 7 lacked composition data entirely, leaving 414 stones with valid FTIR-calibrated composition vectors.
 
-The dataset consists of 301 kidney stone fragments collected at Amsterdam UMC (VUmc) as part of the MOCKI study. Each fragment was photographed ex vivo immediately after retrieval using a standardised imaging protocol, yielding three photographs per stone (903 images in total). Stones were placed on a black background and photographed under controlled lighting conditions with a digital camera. Two stones (S168 and S301) were excluded due to missing FTIR labels, leaving 299 stones (897 images) for analysis.
+Mineral composition was determined by FTIR spectroscopy following standard morpho-constitutional analysis \cite{Daudon2016}, producing continuous percentage values for each component present in the stone. The raw FTIR output distinguishes nine mineral classes.
 
-\subsubsection*{FTIR composition labels}
+\subsection*{Data preprocessing}
 
-Mineral composition was determined by FTIR spectroscopy following standard morpho-constitutional analysis \cite{Daudon2016}. The analysis produces continuous percentage values for each mineral component present in the stone. The raw FTIR output contains nine mineral classes.
+The raw clinical data required several cleaning steps before it could be used for modelling. Fragment identifiers were forward-filled across photo rows, as only the first photo of each stone carried the identifier in the original spreadsheet. Known data-entry errors in the percentage columns were corrected based on clinical verification (six stones). Photo identifiers with formatting inconsistencies---missing prefixes, single-letter abbreviations---were standardised, and trailing whitespace in component labels was stripped.
 
-\subsubsection*{Data preprocessing}
+\subsubsection*{Class consolidation}
 
-Raw data was extracted from the clinical Excel file via a reproducible preprocessing pipeline (\texttt{01\_data\_prep.py}). Several data quality issues were addressed. First, fragment identifiers were forward-filled across photo rows, as only the first photo of each stone carried the identifier in the original spreadsheet. Second, known data-entry errors in the percentage columns were corrected based on clinical verification (six stones: S14, S32, S44, S242--S244). Third, photo identifiers with formatting inconsistencies (missing prefixes, single-letter abbreviations) were standardised. Fourth, trailing whitespace in component labels was stripped to resolve parsing errors.
+We consolidated the nine raw FTIR classes into six target classes through a two-stage remapping. In the first stage, we examined stones labelled as ``OTH'' (other) using the FTIR sub-identification field. Where the mineral could be chemically identified, we reassigned it to the appropriate class: urate salts and uric acid dihydrate (30 stones) were assigned to UA, calcium-magnesium phosphate (4 stones) to CaP, and newberyite (1 stone) to MAP. The remaining OTH stones---calcite, protein, and xanthine---stayed as OTH because they have no clear chemical relationship to the major classes. In the second stage, we merged subtypes into final classes: COM and COD into CaOx, CHP, CHPD, and CMP into CaP, with UA, MAP, and CYS remaining as individual classes.
 
-\subsubsection*{Class consolidation and OTH remapping}
+For Models B and C, the OTH class was excluded because it is chemically heterogeneous and too small (4 stones with OTH as dominant component) to train or evaluate reliably, leaving 5 target classes across 410 stones.
 
-The nine raw FTIR mineral classes were consolidated into six target classes through a two-stage remapping procedure. In the first stage, stones labelled as ``OTH'' (other) were examined using the FTIR sub-identification field recorded during analysis. Spelling variants were normalised, and chemically identifiable minerals were reassigned to the appropriate target class: sodium hydrogen urate hydrate (16 stones), monoammonium urate (7), and uric acid dihydrate (2) were assigned to UA; calcium-magnesium phosphate (3 stones) was assigned to CaP; and newberyite (1 stone) was assigned to MAP. The remaining OTH stones---calcite (9), protein/albumin (10), and xanthine (5)---were retained as OTH because they lack a clear chemical relationship to any of the major classes.
+\subsubsection*{Composition vectors and purity labels}
 
-In the second stage, the standard component codes were merged into the final six classes:
-\begin{itemize}
-    \item \textbf{CaOx}: calcium oxalate monohydrate (COM) + calcium oxalate dihydrate (COD)
-    \item \textbf{CaP}: carbonated hydroxyapatite (CHP) + dihydrate (CHPD) + magnesium-substituted (CMP)
-    \item \textbf{UA}: uric acid (including remapped urate salts)
-    \item \textbf{MAP}: struvite (magnesium ammonium phosphate, including remapped newberyite)
-    \item \textbf{CYS}: cystine
-    \item \textbf{OTH}: remaining minority minerals (calcite, protein, xanthine)
-\end{itemize}
+For each stone, we built a composition vector by summing the FTIR percentages from all positions (primary, secondary, tertiary) into the corresponding class bucket, then normalising the vector to sum to 1.0. This normalised vector serves as the regression target for Model B, and its argmax provides the dominant class label for Model C.
 
-For Models B and C, the OTH class was excluded because it is chemically heterogeneous and too small (4 pure stones at the 90\% threshold) to train or evaluate reliably. After excluding stones whose dominant class was OTH, the remaining dataset for these models consisted of 5 target classes across 295 stones.
-
-\subsubsection*{Composition vectors}
-
-For each stone, a composition vector was constructed by summing the FTIR percentages across all positions (primary, secondary, tertiary) into the corresponding target class bucket. Any residual mass was redistributed proportionally so that each stone's composition vector sums to exactly 1.0. This normalised vector serves as the regression target for Model B and provides the dominant class label (via argmax) for Model C.
-
-\subsubsection*{Purity labelling}
-
-Stones with a single class comprising 100\% of the composition were designated \textit{pure}; all others were designated \textit{mixed}. This strict threshold was chosen in consultation with the urologists at Amsterdam UMC, who consider any detectable mixture clinically relevant. Prior literature has used a more lenient threshold of 90\% \cite{Kim2022}; to enable comparison, we evaluate Model A at both the 100\% and 90\% thresholds and report the effect on classification performance.
+Stones whose composition was 100\% a single mineral were labelled \textit{pure}; all others were labelled \textit{mixed}. This strict threshold was chosen in consultation with the urologists at Amsterdam UMC, who consider any detectable mixture clinically relevant. Prior literature has used a more lenient threshold of 90\% \cite{Kim2022}; we evaluate Model A at both thresholds and compare the effect on classification performance.
 
 \subsubsection*{Data splitting}
 
-All splits were performed at the stone level to prevent data leakage across the three photographs of the same stone. A held-out test set of 20\% of stones was reserved before cross-validation, using stratified sampling on the dominant mineral class. The remaining 80\% was split into five folds using stratified $k$-fold cross-validation. Model selection and hyperparameter tuning were performed exclusively on the cross-validation folds; the test set was used only for final evaluation.
+All splits were performed at the stone level to prevent data leakage between the three photos of the same stone. We held out 20\% of stones as a test set before cross-validation, using stratified sampling on the dominant mineral class. The remaining 80\% was divided into five folds for cross-validation. The test set was used only for final evaluation.
 
-\subsection*{Image preprocessing}
+\subsection*{Image preprocessing and augmentation}
 
-Input images were resized to $224 \times 224$ pixels. Before normalisation, a background masking step was applied: pixels whose mean RGB intensity fell below a threshold (20/255) were zeroed out. This prevents the model from learning features of the black imaging plate rather than the stone surface. After masking, pixel values were normalised using ImageNet channel statistics (mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]).
+Images were resized to $224 \times 224$ pixels. Before normalisation, we applied a background masking step: pixels whose mean RGB intensity fell below a threshold of 20/255 were zeroed out. This prevents the model from learning features of the black imaging plate rather than the stone surface. After masking, pixel values were normalised using ImageNet channel statistics.
 
-During training, data augmentation was applied to increase the effective dataset size and improve generalisation. Augmentations included random horizontal and vertical flips (each with probability 0.5), random rotation up to 45 degrees, and colour jitter (brightness $\pm$0.4, contrast $\pm$0.4, saturation $\pm$0.2). The choice of augmentations reflects the imaging setup: because stones are photographed ex vivo on a flat surface, orientation is arbitrary, justifying aggressive geometric augmentation. Colour jitter accounts for variation in lighting conditions across imaging sessions. No augmentation was applied during validation or testing.
+During training, we applied data augmentation to increase the effective dataset size: random horizontal and vertical flips (each with probability 0.5), random rotation up to 45 degrees, and colour jitter (brightness and contrast $\pm$0.4, saturation $\pm$0.2). Because stones are photographed ex vivo on a flat surface, their orientation is arbitrary, which justifies the aggressive geometric augmentation. Colour jitter accounts for variation in lighting across imaging sessions. No augmentation was applied during validation or testing.
 
 \subsection*{Model architecture}
 
-All three models use ResNet18 \cite{He2016} pretrained on ImageNet (IMAGENET1K\_V1 weights) as the backbone. ResNet18 is an 18-layer residual convolutional network with skip connections that enable stable gradient flow during training. We chose ResNet18 over ResNet50---used in most prior kidney stone classification studies \cite{LopezTiro2024, veltheer2025}---because the small dataset size ($\sim$300 stones) makes the larger model prone to overfitting despite regularisation.
+All three models use ResNet18 \cite{He2016} pretrained on ImageNet as their backbone. ResNet18 is an 18-layer residual network with skip connections that enable stable training of deep networks. We chose ResNet18 over the larger ResNet50---used in most prior kidney stone studies \cite{LopezTiro2024, veltheer2025}---because with only $\sim$420 stones, the larger model is prone to overfitting. The backbone's original classification head is removed, leaving a 512-dimensional feature vector from the global average pooling layer. Each model attaches its own task-specific output head to this feature vector.
 
-The backbone's original classification head is replaced with an identity function, yielding a 512-dimensional feature vector from the global average pooling layer. A task-specific output head is attached to this vector for each model.
+\subsubsection*{Model A: binary classifier}
 
-\subsubsection*{Model A: binary pure/mixed classifier}
-
-Model A adds a dropout layer ($p = 0.5$) followed by a single linear layer mapping the 512-dimensional feature vector to two logits. The model is trained with cross-entropy loss:
-\begin{equation}
-    \mathcal{L}_{\text{CE}} = -\sum_{k=0}^{1} \mathbf{1}[y=k] \log \hat{p}_k
-\end{equation}
-where $y \in \{0, 1\}$ is the ground-truth label (0 = pure, 1 = mixed) and $\hat{p}_k$ is the softmax-normalised predicted probability for class $k$.
-
-Stone-level predictions are obtained by averaging the predicted probability of the mixed class across the three images of the same stone, with a decision threshold of 0.5.
+Model A adds a dropout layer followed by a single linear layer that maps the feature vector to two outputs (pure vs. mixed), trained with cross-entropy loss. At inference time, the predicted probability of the mixed class is averaged across the three photos of a stone, and a threshold of 0.5 is applied.
 
 \subsubsection*{Model B: compositional regression}
 
-Model B is the primary model of this study. It predicts a continuous five-dimensional composition vector $\hat{\mathbf{c}} \in \mathbb{R}^5$ representing the estimated fractional contribution of each mineral class (CaOx, CaP, UA, MAP, CYS). The architecture consists of a shared backbone feeding two output heads.
+Model B is the central model of this thesis. It predicts a continuous five-dimensional composition vector, where each element represents the estimated fraction of a mineral class (CaOx, CaP, UA, MAP, CYS). The architecture has two output heads that share the same backbone.
 
-The \textit{composition head} is a single shared regression head: a linear layer mapping the 512-dimensional feature vector to 128 hidden units, followed by ReLU activation, dropout ($p = 0.5$), and a final linear layer producing 5 logits. These are passed through a softmax function to enforce the compositional simplex:
+The \textit{composition head} maps the feature vector through a hidden layer (512 $\to$ 128 units with ReLU and dropout) to five outputs, which are then passed through a softmax function:
 \begin{equation}
     \hat{c}_k = \frac{\exp(z_k)}{\sum_{j=1}^{5} \exp(z_j)}, \quad k = 1, \ldots, 5
 \end{equation}
-This ensures $\hat{\mathbf{c}} \geq 0$ and $\sum_k \hat{c}_k = 1$, making predictions directly comparable to FTIR-derived composition vectors. The softmax is used as a simplex constraint, not to produce class probabilities---this is a compositional regression problem, not a classification task.
+This enforces the compositional constraint: all predicted fractions are non-negative and sum to 1, making them directly comparable to the FTIR composition vectors. It is important to note that this softmax serves as a simplex constraint, not as a classification mechanism---the task is regression on a compositional target, not classification.
 
-The \textit{auxiliary presence head} independently predicts which mineral classes are present in a stone (fraction $> 0.05$). It shares the same backbone features and has an identical architecture (512 $\to$ 128 $\to$ ReLU $\to$ dropout $\to$ 5), but its outputs pass through independent sigmoids rather than a joint softmax. The presence head provides a secondary training signal that encourages the shared backbone to learn features sensitive to minority components.
+The composition head is trained with Kullback--Leibler (KL) divergence between the predicted and true composition:
+\begin{equation}
+    \mathcal{L}_{\text{KL}} = \sum_{k=1}^{5} c_k \log \frac{c_k}{\hat{c}_k}
+\end{equation}
+We chose KL divergence over simpler alternatives like mean absolute error because it is the natural loss for probability distributions on the simplex. In practical terms, KL divergence penalises confidently wrong predictions more heavily than small errors in already-uncertain classes, which is desirable when the model needs to get the dominant component right while still capturing minority fractions.
 
-The total loss is a weighted combination of two terms:
-\begin{equation}
-    \mathcal{L}_{\text{total}} = \mathcal{L}_{\text{comp}} + \lambda \cdot \mathcal{L}_{\text{pres}}
-\end{equation}
-where $\lambda = 0.3$. The composition loss is Kullback--Leibler divergence between the predicted and true composition distributions:
-\begin{equation}
-    \mathcal{L}_{\text{comp}} = \text{KL}(\mathbf{c} \| \hat{\mathbf{c}}) = \sum_{k=1}^{5} c_k \log \frac{c_k}{\hat{c}_k}
-\end{equation}
-KL divergence is a natural loss for distributions on the simplex: it penalises confidently wrong predictions more heavily than $L_1$ or MSE, which treat all errors equally regardless of how the remaining probability mass is distributed. The presence loss is binary cross-entropy applied independently to each class:
-\begin{equation}
-    \mathcal{L}_{\text{pres}} = -\frac{1}{5} \sum_{k=1}^{5} \left[ t_k \log \sigma(\hat{t}_k) + (1 - t_k) \log (1 - \sigma(\hat{t}_k)) \right]
-\end{equation}
-where $t_k = \mathbf{1}[c_k > 0.05]$ is the binary presence target and $\sigma(\hat{t}_k)$ is the sigmoid-activated output of the presence head.
+The \textit{auxiliary presence head} has the same architecture but outputs independent sigmoid activations, one per class, predicting whether each mineral is present in the stone. This head is trained with binary cross-entropy loss and provides an additional training signal that encourages the backbone to learn features sensitive to minority components, that might otherwise be ignored because their fractions are small. The total loss combines both terms with a weight of 0.3 on the auxiliary loss. The weight was compared across four values: 0.1, 0.3, 0.5 and 0.7.
 
-Stone-level predictions are obtained by averaging the predicted composition vectors across the three images of the same stone, followed by re-normalisation to sum to 1.
+At inference time, composition predictions from the three photos of a stone are averaged and re-normalised to sum to 1.
 
 \subsubsection*{Model C: multiclass classifier}
 
-Model C uses the same backbone and head architecture as Model A (dropout + linear), but outputs five logits corresponding to the five mineral classes. The model is trained with class-weighted cross-entropy loss:
-\begin{equation}
-    \mathcal{L}_{\text{CE}} = -\sum_{k=1}^{5} w_k \cdot \mathbf{1}[y=k] \log \hat{p}_k
-\end{equation}
-where $y$ is the dominant class label (argmax of the FTIR composition vector) and $w_k = N / (K \cdot n_k)$ is the inverse-frequency weight for class $k$ ($N$ is the total training count, $K = 5$, and $n_k$ is the count of class $k$ in the training set). Class weighting was applied because the dataset is heavily imbalanced: CaOx accounts for roughly 43\% of stones while MAP and CYS together represent less than 14\%.
+Model C has the same architecture as Model A (dropout + linear) but outputs five logits, one per mineral class. The target label is the dominant component in the FTIR composition vector. Because the dataset is imbalanced---CaOx accounts for roughly 48\% of stones while MAP represents less than 3\%---we used inverse-frequency class weighting in the cross-entropy loss to prevent the model from simply predicting the majority class.
 
-Model C serves as a direct baseline for Model B: both models can be evaluated on dominant class prediction accuracy, allowing a controlled comparison between predicting continuous compositions and directly classifying the dominant component.
+Model C serves as a direct baseline for Model B. Both models can be evaluated on dominant class prediction, which isolates the question of whether predicting continuous compositions offers any advantage over predicting a single class label directly.
 
-Stone-level predictions are obtained by averaging the softmax class probability vectors across the three images and taking the argmax.
+At inference time, class probabilities from the three photos are averaged and the class with the highest mean probability is selected.
 
 \subsection*{Training procedure}
 
-All models were trained using a two-phase staged fine-tuning strategy.
+All models were trained using a two-phase staged fine-tuning strategy, following the approach used in prior kidney stone classification work \cite{LopezTiro2024, veltheer2025}. In the first phase, we froze the backbone and trained only the output head for 5 epochs. This gives the head a chance to learn a reasonable mapping from ImageNet features before the backbone weights are modified. In the second phase, we unfroze the entire network and trained end-to-end with a much lower learning rate for the backbone than for the head. The idea is that the pre-trained features are already useful and should be adjusted gently rather than overwritten. Training continued for up to 20--25 epochs with early stopping based on validation loss. A summary of all hyperparameters is given in Table~\ref{tab:hyperparams}.
 
-In Phase 1 (frozen backbone), the ResNet18 backbone weights were frozen and only the output head was trained for 5 epochs using the Adam optimiser with a learning rate of $1 \times 10^{-3}$ and weight decay of $1 \times 10^{-3}$. This allows the head to learn a useful mapping from ImageNet features to the target output before the backbone weights are perturbed. Only the head receives gradient updates during this phase.
+% TODO: create hyperparameter table
+\begin{table*}[t]
+    \centering
+    \caption{Training hyperparameters for each model.}
+    \label{tab:hyperparams}
+    \begin{tabular}{lccc}
+        \toprule
+        & Model A & Model B & Model C \\
+        \midrule
+        Backbone & ResNet18 & ResNet18 & ResNet18 \\
+        Frozen epochs & 5 & 5 & 5 \\
+        Fine-tune epochs & 20 & 25 & 25 \\
+        LR (head) & $10^{-3}$ & $10^{-3}$ & $10^{-3}$ \\
+        LR (backbone) & $10^{-5}$ & $10^{-5}$ & $10^{-5}$ \\
+        Weight decay & $10^{-3}$ & $10^{-3}$ & $10^{-3}$ \\
+        Early stopping patience & 5 & 7 & 7 \\
+        Batch size & 64 & 64 & 64 \\
+        Dropout & 0.5 & 0.5 & 0.5 \\
+        Loss & CE & KL + 0.3$\times$BCE & Weighted CE \\
+        \bottomrule
+    \end{tabular}
+\end{table*}
 
-In Phase 2 (full fine-tuning), the entire network was unfrozen and trained end-to-end. Two parameter groups were defined with separate learning rates: the backbone at $1 \times 10^{-5}$ and the head at $1 \times 10^{-3}$. This differential learning rate prevents large gradient updates from destroying the pre-trained backbone representations during early fine-tuning. Phase 2 ran for up to 20 epochs (Model A, Model C) or 25 epochs (Model B), with early stopping based on validation loss (patience = 5 for Models A and C, patience = 7 for Model B). Upon entering Phase 2, the best validation loss tracker was reset, allowing the model to be evaluated against a fair Phase 2 baseline.
+Training was performed on an NVIDIA A100 GPU on the Snellius HPC cluster (SURF). Five-fold cross-validation was used, and all results are reported as the mean $\pm$ standard deviation across folds. All random seeds were fixed for reproducibility.
 
-A batch size of 64 was used throughout. Training was performed on an NVIDIA A100 GPU (80 GB) on the Snellius HPC cluster (SURF). All random seeds were fixed (seed = 42) for reproducibility.
+\subsection*{Evaluation}
 
-Five-fold cross-validation was used to estimate performance. The final reported metrics are the mean and standard deviation across folds.
+All metrics are computed at the stone level after aggregating predictions across the three photos.
 
-\subsection*{Evaluation metrics}
-
-\subsubsection*{Model A}
-
-Binary classification performance was assessed using the area under the receiver operating characteristic curve (AUC-ROC), precision, recall, and F1 score. All metrics are reported at the stone level after mean-probability aggregation.
-
-\subsubsection*{Model B}
-
-Compositional regression performance was evaluated using mean absolute error (MAE) per mineral class and overall, computed at the stone level between predicted and FTIR-derived composition vectors. To allow direct comparison with Model C, Model B predictions were converted to dominant class predictions by taking $\arg\max_k \hat{c}_k$, and macro-F1 and per-class F1 were computed. Presence detection performance of the auxiliary head was evaluated separately using per-class precision, recall, and F1.
-
-\subsubsection*{Model C}
-
-Multiclass classification performance was assessed using macro-averaged F1 score and per-class F1 score, all at the stone level.
+For Model A, we report AUC-ROC, precision, recall, and F1 score. For Model B, we report the mean absolute error (MAE) between predicted and true composition vectors, both per class and overall. To compare Model B directly against Model C, we also derive a dominant class prediction from Model B by taking the class with the highest predicted fraction, and compute macro-F1 and per-class F1 for both models on this shared task. For the auxiliary presence head, we report per-class precision, recall, and F1 separately. For Model C, we report macro-F1 and per-class F1.
 
 \subsection*{Code and data availability}
 
-All pipeline scripts, configuration files, and training code are publicly available at \url{https://github.com/Dirkdeboer/umc_thesis}. Raw images and FTIR labels are held at Amsterdam UMC (VUmc) and are not publicly available but may be accessible on request for academic research purposes.
+All code, configuration files, and training scripts are publicly available at \url{https://github.com/Dirkdeboer/umc_thesis}. The image data and FTIR labels are held at Amsterdam UMC and are not publicly available, but may be accessible on request for academic research.
 
 \bibliographystyle{plain}
 \bibliography{references}
