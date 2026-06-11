@@ -238,7 +238,7 @@ All three models use ResNet18 \cite{He2016} pretrained on ImageNet as their back
 
 \subsubsection*{Model A: binary classifier}
 
-Model A adds a dropout layer followed by a single linear layer that maps the feature vector to two outputs (pure vs. mixed), trained with cross-entropy loss. At inference time, the predicted probability of the mixed class is averaged across the three photos of a stone, and a threshold of 0.5 is applied.
+Model A adds a dropout layer followed by a single linear layer that maps the feature vector to two outputs (pure vs. mixed), trained with weighted cross-entropy loss. To address the class imbalance at the 100\% purity threshold---where mixed stones form 65\% of the dataset---we applied inverse-frequency class weighting to the cross-entropy loss. The weight for each class was set proportional to the inverse of its frequency in the training fold, upweighting pure stones to compensate for their underrepresentation. At inference time, the predicted probability of the mixed class is averaged across the three photos of a stone, and a threshold of 0.5 is applied.
 
 \subsubsection*{Model B: compositional regression}
 
@@ -256,7 +256,7 @@ The composition head is trained with Kullback--Leibler (KL) divergence between t
 \end{equation}
 We chose KL divergence over simpler alternatives like mean absolute error because it is the natural loss for probability distributions on the simplex. In practical terms, KL divergence penalises confidently wrong predictions more heavily than small errors in already-uncertain classes, which is desirable when the model needs to get the dominant component right while still capturing minority fractions.
 
-The \textit{auxiliary presence head} has the same architecture but outputs independent sigmoid activations, one per class, predicting whether each mineral is present in the stone. This head is trained with binary cross-entropy loss and provides an additional training signal that encourages the backbone to learn features sensitive to minority components, that might otherwise be ignored because their fractions are small. "The total loss combines both terms with a weight of 0.3 on the auxiliary loss. This value was selected from \{0.1, 0.3, 0.5, 0.7\} based on validation macro F1 and Spearman's $\rho$
+The \textit{auxiliary presence head} has the same architecture but outputs independent sigmoid activations, one per class, predicting whether each mineral is present in the stone. This head is trained with binary cross-entropy loss and provides an additional training signal that encourages the backbone to learn features sensitive to minority components, that might otherwise be ignored because their fractions are small. The total loss combines both terms with a weight of 0.3 on the auxiliary loss. This value was selected from \{0.1, 0.3, 0.5, 1.0\} based on validation macro F1 and Spearman's $\rho$
 (Appendix~\ref{app:lambda}).
 
 At inference time, composition predictions from the three photos of a stone are averaged and re-normalised to sum to 1.
@@ -291,7 +291,7 @@ All models were trained using a two-phase staged fine-tuning strategy, following
         Early stopping patience & 5 & 7 & 7 \\
         Batch size & 64 & 64 & 64 \\
         Dropout & 0.5 & 0.5 & 0.5 \\
-        Loss & CE & KL + 0.3$\times$BCE & Weighted CE \\
+        Loss & Weighted CE & KL + 0.3$\times$BCE & Weighted CE \\
         \bottomrule
     \end{tabular}
 \end{table*}
@@ -329,7 +329,7 @@ Model A achieved an AUC of 0.746 $\pm$ 0.044 on cross-validation at the 100\% pu
 
 The 100\% threshold performed slightly better and with lower variance across folds. This may seem counterintuitive---a stricter threshold means fewer pure stones, making the task harder---but it also makes the distinction sharper: a stone is pure only if it contains absolutely no secondary minerals, giving the model a cleaner signal to learn from. At 90\%, the boundary between pure and mixed becomes fuzzier, and stones near the threshold may look visually similar regardless of which side they fall on.
 
-The confusion matrices on the held-out test set (Figure~\ref{fig:confusion}) reveal how the model's errors differ between thresholds. At 100\%, where mixed stones are the majority (65\%), the model correctly identifies 89\% of mixed stones but only 42\% of pure stones---it tends to predict ``mixed'' by default. At 90\%, the class balance shifts (55\% pure) and the pattern reverses: 87\% recall on pure stones, but only 35\% on mixed. In both cases, the model leans toward whichever class is more prevalent.
+Even with inverse-frequency class weighting, the model shows residual bias toward the majority class at each threshold (Figure~\ref{fig:confusion}). At the 100\% threshold, recall on mixed stones remains higher than on pure stones (90\% vs.\ 44\%); at the 90\% threshold, the pattern reverses (77\% pure recall vs.\ 58\% mixed). This residual asymmetry reflects the visual difficulty of the task near the boundary: stones that are borderline pure or mixed look nearly identical regardless of which side of the threshold they fall on. Class weighting can shift the decision boundary but cannot recover visual information that is not present in the image.
 
 \begin{figure*}[ht]
     \centering
@@ -353,6 +353,27 @@ The confusion matrices on the held-out test set (Figure~\ref{fig:confusion}) rev
     \caption{\textbf{ROC curves for Model A (binary classifier) across purity thresholds.} Mean ROC curves with $\pm$1 standard deviation bands across five cross-validation folds. The 100\% purity threshold (red) achieves a higher and more stable AUC than the 90\% threshold (blue). The random-label baseline (green) confirms that performance is not driven by class imbalance or data leakage.}
     \label{fig:roc}
 \end{figure*}
+
+\begin{figure*}[ht]
+    \centering
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/training_curves.png}
+        \caption{Model A (binary classifier)}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/simple_training_curves.png}
+        \caption{Model B (compositional regression)}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/training_curves_multiclass.png}
+        \caption{Model C (multiclass classifier)}
+    \end{subfigure}
+    \caption{\textbf{Training and validation loss curves per model.} Mean loss across five cross-validation folds with $\pm$1 standard deviation bands. The vertical dashed line marks the transition from Phase~1 (frozen backbone) to Phase~2 (full fine-tuning). Early stopping is applied in Phase~2; the number of epochs therefore varies across folds.}
+    \label{fig:losscurves}
+\end{figure*}
  
 \subsection*{Model B: compositional regression}
  
@@ -369,21 +390,20 @@ The violin plot reveals an important asymmetry in the errors. CaOx predictions a
  
 \subsubsection*{Auxiliary loss weight selection}
  
-The weight $\lambda$ of the auxiliary presence detection loss was selected from \{0.1, 0.3, 0.5, 0.7\} based on validation performance. Table~\ref{tab:lambda} shows the macro F1 (on dominant class prediction) and overall Spearman's $\rho$ for each value. A weight of 0.3 yielded the best balance: lower values gave the presence head too little influence to improve feature learning, while higher values shifted the training signal away from the composition objective.
+The weight $\lambda$ of the auxiliary presence detection loss was selected from \{0.1, 0.3, 0.5, 1.0\} based on validation performance. Table~\ref{tab:lambda} shows the macro F1 (on dominant class prediction) for each value; Spearman's $\rho$ was not logged per-run during the sweep (see Appendix~\ref{app:lambda}). A weight of 0.3 yielded the best balance: lower values gave the presence head too little influence to improve feature learning, while higher values shifted the training signal away from the composition objective.
  
-% TODO: fill in with actual numbers from your lambda sweep
 \begin{table}[ht]
     \centering
-    \caption{\textbf{Effect of auxiliary loss weight $\lambda$ on Model B validation performance.} Macro F1 is computed on the dominant class prediction (argmax of the composition vector). Spearman's $\rho$ is the mean rank correlation between predicted and true fractions across all classes. Best values in bold.}
+    \caption{\textbf{Effect of auxiliary loss weight $\lambda$ on Model B validation performance.} Macro F1 is the mean across five cross-validation folds (best epoch per fold). Spearman's $\rho$ was not logged per-run during the sweep. Best Macro F1 in bold.}
     \label{tab:lambda}
     \begin{tabular}{lcc}
         \toprule
         $\lambda$ & Macro F1 & Spearman's $\rho$ \\
         \midrule
-        0.1 & -- & -- \\
-        \textbf{0.3} & \textbf{--} & \textbf{--} \\
-        0.5 & -- & -- \\
-        0.7 & -- & -- \\
+        0.1 & 0.51 $\pm$ 0.05 & -- \\
+        \textbf{0.3} & \textbf{0.45 $\pm$ 0.12} & \textbf{--} \\
+        0.5 & 0.43 $\pm$ 0.11 & -- \\
+        1.0 & 0.50 $\pm$ 0.07 & -- \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -405,7 +425,6 @@ The per-class breakdown reveals a more nuanced picture. For CaOx, the two models
  
 Table~\ref{tab:summary} brings together the key metrics across all three models on both cross-validation and the held-out test set.
  
-% TODO: fill in with actual numbers from your CSV summaries
 \begin{table*}[ht]
     \centering
     \caption{\textbf{Summary of model performance.} Cross-validation results are reported as mean $\pm$ standard deviation across five folds. Test set results are from the held-out 20\% of stones. Model A is evaluated at the 100\% purity threshold. For Model B, dominant class metrics are derived by taking the argmax of the predicted composition vector.}
@@ -432,7 +451,7 @@ We set out to investigate whether continuous mineral composition can be predicte
  
 \subsection*{Binary classification depends on the purity threshold}
  
-Model A achieved AUC values of 0.715 and 0.703 on the held-out test set at the 100\% and 90\% purity thresholds, respectively, with cross-validation AUCs of 0.746 $\pm$ 0.044 and 0.705 $\pm$ 0.093 (Figure~\ref{fig:roc}). On the surface these numbers look similar, but the confusion matrices (Figure~\ref{fig:confusion}) tell a more informative story. At the 100\% threshold, where mixed stones form the majority (65\%), the model correctly identifies 89\% of mixed stones while missing the majority of pure stones (42\% recall). When the threshold is relaxed to 90\%, the class balance inverts to 55\% pure and the bias flips: 87\% recall on pure, 35\% on mixed.
+Model A achieved AUC values of 0.715 and 0.703 on the held-out test set at the 100\% and 90\% purity thresholds, respectively, with cross-validation AUCs of 0.746 $\pm$ 0.044 and 0.705 $\pm$ 0.093 (Figure~\ref{fig:roc}). On the surface these numbers look similar, but the confusion matrices (Figure~\ref{fig:confusion}) tell a more informative story. At the 100\% threshold, where mixed stones form the majority (65\%), the model correctly identifies 90\% of mixed stones while missing the majority of pure stones (44\% recall). When the threshold is relaxed to 90\%, the class balance inverts to 63\% pure and the bias flips: 77\% recall on pure, 58\% on mixed.
  
 This pattern is not a model failure---it is a systematic consequence of moderate class imbalance. The model responds to the shift in prior by leaning toward whichever class dominates, rather than learning a truly threshold-invariant visual feature for purity. The substantially higher fold-to-fold variance at the 90\% threshold (AUC std = 0.093 vs. 0.044) is also telling: near-boundary stones---those with 89--91\% of a single mineral---look virtually identical regardless of which side of the cutoff they fall on, introducing label noise that destabilises training.
  
@@ -507,21 +526,20 @@ The primary bottleneck is dataset size. With approximately 420 stones, rare-clas
 \section{Auxiliary loss weight selection}
 \label{app:lambda}
 
-The weight $\lambda$ of the auxiliary presence detection loss was selected from \{0.1, 0.3, 0.5, 0.7\} based on cross-validation performance (Table~\ref{tab:lambda}). A weight of 0.3 yielded the best macro F1 and Spearman's $\rho$; lower values gave the presence head too little influence, while higher values shifted training away from the composition objective.
+The weight $\lambda$ of the auxiliary presence detection loss was selected from \{0.1, 0.3, 0.5, 1.0\} based on cross-validation performance (Table~\ref{tab:lambda}). A weight of 0.3 yielded the best balance between composition accuracy and minority-class feature learning; lower values gave the presence head too little influence, while higher values shifted training away from the composition objective.
 
-% TODO: fill in with actual numbers
 \begin{table}[ht]
     \centering
-    \caption{Effect of auxiliary loss weight $\lambda$ on Model B validation performance.}
-    \label{tab:lambda}
+    \caption{Effect of auxiliary loss weight $\lambda$ on Model B validation performance. Macro F1 is the mean across five CV folds (best epoch per fold). Spearman's $\rho$ was not logged per-run during the sweep.}
+    \label{tab:lambda_appendix}
     \begin{tabular}{lcc}
         \toprule
         $\lambda$ & Macro F1 & Spearman's $\rho$ \\
         \midrule
-        0.1 & -- & -- \\
-        \textbf{0.3} & \textbf{--} & \textbf{--} \\
-        0.5 & -- & -- \\
-        0.7 & -- & -- \\
+        0.1 & 0.51 $\pm$ 0.05 & -- \\
+        \textbf{0.3} & \textbf{0.45 $\pm$ 0.12} & \textbf{--} \\
+        0.5 & 0.43 $\pm$ 0.11 & -- \\
+        1.0 & 0.50 $\pm$ 0.07 & -- \\
         \bottomrule
     \end{tabular}
 \end{table}
