@@ -79,7 +79,8 @@
   \vspace{2cm}
   {\large \textbf{Author:} Dirk de Boer\\ \textbf{Student number}: 2663349} \\
   \vspace{0.5cm}
-  {\large \textbf{Supervisors:} Prof. Martijn Schut (UMC), Adel Schmucklermann (UMC), Paula Afken (UMC)\\}
+  {\large \textbf{Daily supervisors:} Adel Schmucklermann (Amsterdam UMC), Paula Afken (Amsterdam UMC)\\}
+  {\large \textbf{Supervisor (VU):} Prof. Martijn Schut (Amsterdam UMC)\\}
   {\large \textbf{Examiner:} Dr. Solon Pissis (VU)\\}
   \vfill
   {\large The work of this thesis was carried out at the Amsterdam UMC, Translational AI Laboratory.}
@@ -177,7 +178,7 @@ All three models share the same backbone architecture and training procedure; th
 
 \subsection*{Dataset}
 
-The dataset consists of 416 kidney stone fragments collected at Amsterdam UMC (VUmc) as part of the MOCKI study. Each fragment was photographed ex vivo immediately after retrieval, yielding three photographs per stone (1248 images total). Stones were placed on a black background and photographed under controlled lighting with a digital camera. Two stones were excluded due to missing FTIR labels, leaving 414 stones with valid FTIR-calibrated composition vectors.
+The dataset consists of 416 kidney stone fragments collected at Amsterdam UMC (VUmc) as part of the MOCKI study. Each fragment was photographed ex vivo immediately after retrieval, yielding three photographs per stone. Two stones were excluded due to missing FTIR labels, leaving 414 stones (1242 images) with valid FTIR-calibrated composition vectors.
 
 Mineral composition was determined by FTIR spectroscopy following standard morpho-constitutional analysis \cite{Daudon2016}, producing continuous percentage values for each component present in the stone. The raw FTIR output distinguishes nine mineral classes.
 
@@ -336,7 +337,7 @@ Training and validation loss curves for all three models are provided in Appendi
 
 \subsection*{Model B: compositional regression}
  
-The composition model learned to predict continuous mineral fractions with varying accuracy across classes (Figure~\ref{fig:violin}). On the held-out test set, CaOx showed the strongest performance (MAE = 0.295, $\rho$ = 0.67), followed by CaP (MAE = 0.260, $\rho$ = 0.51). This is consistent with these two classes together comprising 78% of dominant-class assignments (CaOx: 49%, CaP: 29%) and having the widest range of true fractions for the model to learn from. UA, MAP, and CYS had lower MAE values (0.169, 0.078, and 0.107 respectively), partly because their true fractions are zero in stones where these minerals are absent, but their rank correlations were moderate to strong ($\rho$ = 0.45--0.60), suggesting the model captures the relative ordering of stones even for minority classes. The random-label baseline achieved MAE = 0.432 for CaOx ($\rho$ = $-$0.07) and MAE = 0.290 for CaP ($\rho$ = 0.13), confirming that the trained model's errors and correlations reflect genuine visual feature learning rather than distributional artefacts.
+The composition model learned to predict continuous mineral fractions with varying accuracy across classes (Figure~\ref{fig:violin}). On the held-out test set, CaOx showed the strongest performance (MAE = 0.295, $\rho$ = 0.67), followed by CaP (MAE = 0.260, $\rho$ = 0.51). This is consistent with these two classes together comprising 77% of dominant-class assignments (CaOx: 48%, CaP: 29%) and having the widest range of true fractions for the model to learn from. UA, MAP, and CYS had lower MAE values (0.169, 0.078, and 0.107 respectively), partly because their true fractions are zero in stones where these minerals are absent, but their rank correlations were moderate to strong ($\rho$ = 0.45--0.60), suggesting the model captures the relative ordering of stones even for minority classes. The random-label baseline achieved MAE = 0.432 for CaOx ($\rho$ = $-$0.07) and MAE = 0.290 for CaP ($\rho$ = 0.13), confirming that the trained model's errors and correlations reflect genuine visual feature learning rather than distributional artefacts.
  
 The violin plot reveals an important asymmetry in the errors. CaOx predictions are skewed below zero, meaning the model tends to underestimate calcium oxalate fractions. CaP shows the opposite pattern---a positive bias, with the model overestimating calcium phosphate. Since CaOx and CaP frequently co-occur in mixed stones and their fractions must sum to 1 (along with the other classes), this suggests the model struggles to correctly partition the composition between these two dominant classes. For the minority classes (UA, MAP, CYS), errors are more symmetric and concentrated near zero.
  
