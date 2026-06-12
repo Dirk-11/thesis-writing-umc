@@ -78,7 +78,7 @@
   \vspace{2cm}
   {\large \textbf{Author:} Dirk de Boer\\ \textbf{Student number}: 2663349} \\
   \vspace{0.5cm}
-  {\large \textbf{Supervisors:} Prof. Martijn Schut (UMC), Adel Schmucklermann (UMC) Paula Afken (UMC)\\}
+  {\large \textbf{Supervisors:} Prof. Martijn Schut (UMC), Adel Schmucklermann (UMC), Paula Afken (UMC)\\}
   {\large \textbf{Examiner:} Dr. Solon Pissis (VU)\\}
   \vfill
   {\large The work of this thesis was carried out at the Amsterdam UMC, Translational AI Laboratory.}
@@ -168,7 +168,7 @@ All three models share the same backbone architecture and training procedure; th
 \begin{figure*}[ht]
     \centering
     \includegraphics[width=0.7\textwidth]{figures/workflow_v3_3.png}
-    \caption{Overview of the study design.}
+    \caption{\textbf{Overview of the three-model study design.} Starting from the MOCKI dataset (414 stones, three ex vivo photographs each, with FTIR composition labels), data were preprocessed into five-class composition vectors. Three ResNet18 models were trained in parallel: Model A (binary pure/mixed classifier, weighted CE loss), Model B (compositional regression, weighted KL + auxiliary BCE loss), and Model C (multiclass dominant-class classifier, weighted CE loss). Each model is evaluated with task-specific metrics and placed in context via two comparisons: a threshold comparison for Model A (90\% vs.\ 100\% purity definition) and a dominant-class comparison for Models B and C.}
     \label{fig:workflow}
 \end{figure*}
 
@@ -180,7 +180,7 @@ Mineral composition was determined by FTIR spectroscopy following standard morph
 
 \subsection*{Data preprocessing}
 
-The raw clinical data required several cleaning steps before it could be used for modelling. Fragment identifiers were forward-filled across photo rows, as only the first photo of each stone carried the identifier in the original spreadsheet. Known data-entry errors in the percentage columns were corrected based on clinical verification (six stones). Photo identifiers with formatting inconsistencies---missing prefixes, single-letter abbreviations---were standardised, and trailing whitespace in component labels was stripped.
+The raw clinical data required four cleaning steps before it could be used for modelling. Fragment identifiers were forward-filled across photo rows, as only the first photo of each stone carried the identifier in the original spreadsheet. Known data-entry errors in the percentage columns were corrected based on clinical verification (six stones). Photo identifiers with formatting inconsistencies---missing prefixes, single-letter abbreviations---were standardised, and trailing whitespace in component labels was stripped.
 
 \subsubsection*{Class consolidation}
 
@@ -196,7 +196,9 @@ Stones whose composition was 100\% a single mineral were labelled \textit{pure};
 
 \subsubsection*{Data splitting}
  
-All splits were performed at the stone level to prevent data leakage between the three photos of the same stone. Models B and C operate on 410 stones (excluding the 4 OTH-dominant stones described above); Model A operates on all 414 stones. For each model, we first held out 20\% of stones as a test set using stratified sampling, then divided the remaining 80\% into five folds using stratified $k$-fold cross-validation. The stratification variable was chosen to match each model's target: for Model A, both the test set and folds were stratified on the binary pure/mixed label; for Models B and C, stratification was on the dominant mineral class. Because Models B and C share the same stratification variable, sample pool (excluding OTH-dominant stones), and random seed, their fold assignments and test sets are identical, enabling a direct per-fold comparison. Model A operates on a slightly different sample pool (including OTH-dominant stones) with different stratification, so its test set is not identical to that of Models B and C. The test set was used only for final evaluation.
+All splits were performed at the stone level to prevent data leakage: the three photographs of the same stone always end up in the same split. For each model we held out 20\% of stones as a test set (stratified sampling), then split the remaining 80\% into five stratified folds for cross-validation. The stratification variable matched each model's target---binary label for Model A, dominant mineral class for Models B and C.
+
+Because Models B and C share the same 410-stone pool, the same stratification variable, and the same random seed, their fold assignments and test sets are identical. This means we can compare them fold-by-fold rather than just on the aggregated test set. Model A uses all 414 stones with a different stratification, so its test set is not directly comparable. The held-out test set was used only for the final evaluation reported in this thesis.
 
 \subsection*{Image preprocessing and augmentation}
 
@@ -245,7 +247,6 @@ At inference time, class probabilities from the three photos are averaged and th
 
 All models were trained using a two-phase staged fine-tuning strategy, following the approach used in prior kidney stone classification work \cite{LopezTiro2024, veltheer2025}. In the first phase, we froze the backbone and trained only the output head for 5 epochs. This gives the head a chance to learn a reasonable mapping from ImageNet features before the backbone weights are modified. In the second phase, we unfroze the entire network and trained end-to-end with a much lower learning rate for the backbone than for the head. The idea is that the pre-trained features are already useful and should be adjusted gently rather than overwritten. Training continued for up to 20 epochs (Model A) or 25 epochs (Models B and C) with early stopping based on validation loss. A summary of all hyperparameters is given in Table~\ref{tab:hyperparams}.
 
-% TODO: create hyperparameter table
 \begin{table*}[t]
     \centering
     \caption{Training hyperparameters for each model.}
@@ -469,6 +470,10 @@ Addressing the first sub-question, Model A distinguishes pure from mixed stones 
 Addressing the second sub-question, the compositional regression model matches the multiclass classifier on overall dominant-class macro F1 (0.483 vs. 0.430) and outperforms it on calcium phosphate (F1 = 0.44 vs. 0.38) and uric acid (F1 = 0.46 vs. 0.35). It shows a smaller advantage on cystine (F1 = 0.59 vs. 0.55), while the MAP test set is too small to support a comparison. Together, these results show that the regression framing is at least as strong as direct classification for dominant-class prediction, and better on calcium phosphate and uric acid, while also providing the continuous composition output that motivates the approach.
  
 The primary bottleneck is dataset size. With 414 stones (410 for the composition models), rare-class learning is limited and the model sees too few intermediate mixed compositions to accurately partition co-occurring minerals. Extending this work to larger, multi-institutional datasets and ultimately to in vivo endoscopic images are the key next steps toward clinical translation.
+
+\section*{Acknowledgements}
+
+I am grateful to my supervisors Prof.\ Martijn Schut, Adel Schmucklermann, and Paula Afken at Amsterdam UMC for their support, clinical insight, and guidance throughout this project. Their feedback shaped the direction of this work at every stage. I also thank Dr.\ Solon Pissis for his role as examiner. This work was carried out at the Translational AI Laboratory (TrAIL) at Amsterdam UMC; I am grateful to the team for providing access to the MOCKI dataset and for the clinical context that made it interpretable. Computing time was provided by the Dutch national e-infrastructure SURF (Snellius HPC cluster), without which the model training and cross-validation experiments would not have been feasible.
 
 \bibliographystyle{plain}
 \bibliography{references}
