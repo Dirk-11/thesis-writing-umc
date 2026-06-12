@@ -332,27 +332,8 @@ Even with inverse-frequency class weighting, the model shows residual bias towar
     \label{fig:roc}
 \end{figure}
 
-\begin{figure*}[ht]
-    \centering
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/training_curves.png}
-        \caption{Model A (binary classifier)}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/simple_training_curves.png}
-        \caption{Model B (compositional regression)}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/training_curves_multiclass.png}
-        \caption{Model C (multiclass classifier)}
-    \end{subfigure}
-    \caption{\textbf{Training and validation loss curves per model.} Mean loss across five cross-validation folds with $\pm$1 standard deviation bands. The vertical dashed line marks the transition from Phase~1 (frozen backbone) to Phase~2 (full fine-tuning). Early stopping is applied in Phase~2; the number of epochs therefore varies across folds.}
-    \label{fig:losscurves}
-\end{figure*}
- 
+Training and validation loss curves for all three models are provided in Appendix~\ref{app:losscurves}.
+
 \subsection*{Model B: compositional regression}
  
 The composition model learned to predict continuous mineral fractions with varying accuracy across classes (Figure~\ref{fig:violin}). On the held-out test set, CaOx showed the strongest performance (MAE = 0.295, $\rho$ = 0.67), followed by CaP (MAE = 0.260, $\rho$ = 0.51). This is consistent with these two classes together comprising 78% of dominant-class assignments (CaOx: 49%, CaP: 29%) and having the widest range of true fractions for the model to learn from. UA, MAP, and CYS had lower MAE values (0.169, 0.078, and 0.107 respectively), partly because their true fractions are zero in stones where these minerals are absent, but their rank correlations were moderate to strong ($\rho$ = 0.45--0.60), suggesting the model captures the relative ordering of stones even for minority classes.
@@ -505,5 +486,29 @@ The weight $\lambda$ of the auxiliary presence detection loss was selected from 
         \bottomrule
     \end{tabular}
 \end{table}
+
+\section{Training and validation loss curves}
+\label{app:losscurves}
+
+\begin{figure*}[ht]
+    \centering
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/training_curves.png}
+        \caption{Model A (binary classifier)}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/simple_training_curves.png}
+        \caption{Model B (compositional regression)}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/training_curves_multiclass.png}
+        \caption{Model C (multiclass classifier)}
+    \end{subfigure}
+    \caption{\textbf{Training and validation loss curves per model.} Mean loss across five cross-validation folds with $\pm$1 standard deviation bands. The vertical dashed line marks the transition from Phase~1 (frozen backbone) to Phase~2 (full fine-tuning). Early stopping is applied in Phase~2; the number of epochs therefore varies across folds.}
+    \label{fig:losscurves}
+\end{figure*}
 
 \end{document}
