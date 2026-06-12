@@ -343,7 +343,7 @@ The violin plot reveals an important asymmetry in the errors. CaOx predictions a
 \begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{figures/simple_composition_error_violin_test.png}
-    \caption{\textbf{Per-class prediction error distribution for Model B on the held-out test set.} Each violin shows the distribution of (predicted $-$ true) composition fractions. The horizontal line at zero indicates perfect prediction; the crossbar shows the median. MAE and Spearman's $\rho$ are annotated per class. CaOx and CaP show the widest error distributions, with CaOx systematically underpredicted and CaP overpredicted, suggesting the model struggles to partition composition between these co-occurring classes.}
+    \caption{\textbf{Per-class prediction error distribution for Model B on the held-out test set.} Each violin shows the distribution of (predicted $-$ true) composition fractions after top-3 post-processing (the three smallest predicted fractions per stone are set to zero and the vector is renormalised). The horizontal line at zero indicates perfect prediction; the crossbar shows the median. MAE and Spearman's $\rho$ are annotated per class. CaOx and CaP show the widest error distributions, with CaOx systematically underpredicted and CaP overpredicted, suggesting the model struggles to partition composition between these co-occurring classes.}
     \label{fig:violin}
 \end{figure}
  
