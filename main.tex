@@ -540,9 +540,9 @@ Figure~\ref{fig:confusion_c} shows the per-class confusion matrix for Model C (m
 
 Figure~\ref{fig:scatter_b} shows predicted versus true mineral fractions for Model B on the held-out test set. Points close to the diagonal indicate accurate predictions. CaOx and CaP show the widest spread, reflecting the difficulty of partitioning fractions between co-occurring dominant minerals. Minority classes (UA, MAP, CYS) cluster near zero because most stones contain little or none of these minerals, but the model captures the relative ordering (Spearman $\rho = 0.45$--$0.67$).
 
-\begin{figure*}[h]
+\begin{figure*}[p]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/simple_composition_scatter_test.png}
+    \includegraphics[width=0.9\textwidth]{figures/simple_composition_scatter_test.png}
     \caption{\textbf{Model B predicted vs.\ true mineral fractions on the held-out test set.} Each panel shows one mineral class; the diagonal is the line of perfect prediction. MAE and Spearman $\rho$ are annotated per class. Post-processing retains the top-3 predicted fractions per stone (the remaining are set to zero and the vector is renormalised).}
     \label{fig:scatter_b}
 \end{figure*}
