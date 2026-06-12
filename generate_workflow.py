@@ -57,45 +57,43 @@ def arr(ax, x0, y0, x1, y1):
 
 
 def main():
-    fig, ax = plt.subplots(figsize=(7.5, 7.0))
+    fig, ax = plt.subplots(figsize=(7.5, 5.5))
     ax.set_xlim(0, 1)
-    ax.set_ylim(0.24, 1.0)
+    ax.set_ylim(0.33, 1.0)
     ax.axis("off")
     fig.patch.set_facecolor("white")
 
     # ── MOCKI dataset ────────────────────────────────────────────────────────
-    rounded_box(ax, 0.50, 0.920, 0.52, 0.085,
+    rounded_box(ax, 0.50, 0.930, 0.52, 0.078,
                 ["MOCKI dataset",
                  "414 stones × 3 photos + FTIR labels"],
                 *C_DATASET, fontsize=9.5)
-    arr(ax, 0.50, 0.877, 0.50, 0.822)
+    arr(ax, 0.50, 0.891, 0.50, 0.858)          # short gap
 
     # ── Preprocessing ────────────────────────────────────────────────────────
-    rounded_box(ax, 0.50, 0.790, 0.68, 0.080,
+    rounded_box(ax, 0.50, 0.820, 0.68, 0.075,
                 ["Preprocessing",
                  "Data cleaning · OTH remapping · 9→5 classes",
                  "Composition vectors (Σ=1)"],
                 *C_PREP, fontsize=8.5)
 
     # ResNet18 annotation (italic, small)
-    ax.text(0.50, 0.740, "ResNet18 · ImageNet pretrained · staged fine-tuning",
+    ax.text(0.50, 0.768, "ResNet18 · ImageNet pretrained · staged fine-tuning",
             ha="center", va="center", fontsize=8, color="#555555",
             fontfamily="DejaVu Sans", style="italic", zorder=4)
 
-    # Trunk down to branch point
-    arr(ax, 0.50, 0.750, 0.50, 0.700)
+    # Trunk down to branch point (starts below italic text)
+    arr(ax, 0.50, 0.756, 0.50, 0.730)          # short gap
 
     # ── Branch arrows to three models ────────────────────────────────────────
-    branch_y = 0.700
-    # Horizontal line
+    branch_y = 0.730
     ax.plot([0.17, 0.83], [branch_y, branch_y], color=C_ARROW, lw=1.3, zorder=2)
-    # Down to each model
     for x in [0.17, 0.50, 0.83]:
-        arr(ax, x, branch_y, x, 0.650)
+        arr(ax, x, branch_y, x, 0.693)          # short drop to models
 
     # ── Model boxes ──────────────────────────────────────────────────────────
-    model_y  = 0.605
-    model_h  = 0.090
+    model_y  = 0.650
+    model_h  = 0.083
     model_w  = 0.28
 
     rounded_box(ax, 0.17, model_y, model_w, model_h,
@@ -111,12 +109,12 @@ def main():
                 *C_C, fontsize=8.5)
 
     # ── Arrows to metric boxes ────────────────────────────────────────────────
-    metric_y = 0.465
+    metric_y = 0.535
     for x in [0.17, 0.50, 0.83]:
-        arr(ax, x, model_y - model_h / 2, x, metric_y + 0.040)
+        arr(ax, x, model_y - model_h / 2, x, metric_y + 0.028)
 
     # ── Metric boxes ─────────────────────────────────────────────────────────
-    metric_h = 0.055
+    metric_h = 0.050
     metric_w = 0.26
 
     rounded_box(ax, 0.17, metric_y, metric_w, metric_h,
@@ -129,19 +127,19 @@ def main():
                 ["Macro F1, per-class F1"], *C_METRIC_C, fontsize=8.5, bold_first=False)
 
     # ── Arrows to comparison boxes ────────────────────────────────────────────
-    compare_y = 0.320
+    compare_y = 0.408
     # Model A → Threshold comparison
-    arr(ax, 0.17, metric_y - metric_h / 2, 0.17, compare_y + 0.048)
+    arr(ax, 0.17, metric_y - metric_h / 2, 0.17, compare_y + 0.040)
     # Model B + C → Dominant class comparison
     for x in [0.50, 0.83]:
-        ax.plot([x, x], [metric_y - metric_h / 2, compare_y + 0.048],
+        ax.plot([x, x], [metric_y - metric_h / 2, compare_y + 0.040],
                 color=C_ARROW, lw=1.3, zorder=2)
-    ax.plot([0.50, 0.83], [compare_y + 0.048, compare_y + 0.048],
+    ax.plot([0.50, 0.83], [compare_y + 0.040, compare_y + 0.040],
             color=C_ARROW, lw=1.3, zorder=2)
-    arr(ax, 0.665, compare_y + 0.048, 0.665, compare_y + 0.045)
+    arr(ax, 0.665, compare_y + 0.040, 0.665, compare_y + 0.037)
 
     # ── Comparison boxes ──────────────────────────────────────────────────────
-    cmp_h = 0.072
+    cmp_h = 0.065
     cmp_w = 0.30
 
     rounded_box(ax, 0.17, compare_y, cmp_w, cmp_h,
