@@ -174,7 +174,7 @@ All three models share the same backbone architecture and training procedure; th
 
 \subsection*{Dataset}
 
-The dataset consists of 423 kidney stone fragments collected at Amsterdam UMC (VUmc) as part of the MOCKI study. Each fragment was photographed ex vivo immediately after retrieval, yielding three photographs per stone (1269 images total). Stones were placed on a black background and photographed under controlled lighting with a digital camera. Two stones were excluded due to missing FTIR labels, and a further 7 lacked composition data entirely, leaving 414 stones with valid FTIR-calibrated composition vectors.
+The dataset consists of 416 kidney stone fragments collected at Amsterdam UMC (VUmc) as part of the MOCKI study. Each fragment was photographed ex vivo immediately after retrieval, yielding three photographs per stone (1269 images total). Stones were placed on a black background and photographed under controlled lighting with a digital camera. Two stones were excluded due to missing FTIR labels, leaving 414 stones with valid FTIR-calibrated composition vectors.
 
 Mineral composition was determined by FTIR spectroscopy following standard morpho-constitutional analysis \cite{Daudon2016}, producing continuous percentage values for each component present in the stone. The raw FTIR output distinguishes nine mineral classes.
 
@@ -303,7 +303,7 @@ Model A achieved an AUC of 0.750 $\pm$ 0.026 on cross-validation at the 100\% pu
 
 The 100\% threshold performed slightly better and with lower variance across folds. This may seem counterintuitive---a stricter threshold means fewer pure stones, making the task harder---but it also makes the distinction sharper: a stone is pure only if it contains absolutely no secondary minerals, giving the model a cleaner signal to learn from. At 90\%, the boundary between pure and mixed becomes fuzzier, and stones near the threshold may look visually similar regardless of which side they fall on.
 
-Even with inverse-frequency class weighting, the model shows residual bias toward the majority class at each threshold (Figure~\ref{fig:confusion}). At the 100\% threshold, recall on mixed stones remains higher than on pure stones (90\% vs.\ 44\%); at the 90\% threshold, the pattern reverses (77\% pure recall vs.\ 58\% mixed). This residual asymmetry reflects the visual difficulty of the task near the boundary: stones that are borderline pure or mixed look nearly identical regardless of which side of the threshold they fall on. Class weighting can shift the decision boundary but cannot recover visual information that is not present in the image.
+Even with inverse-frequency class weighting, the model shows residual bias toward the majority class at each threshold (Figure~\ref{fig:confusion}). At the 100\% threshold, recall on mixed stones remains higher than on pure stones (79\% vs. 44\%); at the 90\% threshold, the pattern reverses (77\% pure recall vs. 58\% mixed). This residual asymmetry reflects the visual difficulty of the task near the boundary: stones that are borderline pure or mixed look nearly identical regardless of which side of the threshold they fall on. Class weighting can shift the decision boundary but cannot recover visual information that is not present in the image.
 
 \begin{figure*}[ht]
     \centering
@@ -317,14 +317,14 @@ Even with inverse-frequency class weighting, the model shows residual bias towar
         \includegraphics[width=\textwidth]{figures/confusion_matrix_test_t90.png}
         \caption{90\% purity threshold}
     \end{subfigure}
-    \caption{\textbf{Confusion matrices for Model A on the held-out test set.} At the 100\% threshold (a), the model achieves high recall on mixed stones but misclassifies the majority of pure stones. At the 90\% threshold (b), the bias reverses: high recall on pure stones, low recall on mixed. Both thresholds show a tendency to predict the majority class.}
+    \caption{\textbf{Confusion matrices for Model A on the held-out test set.} At the 100\% threshold (a), the model achieves a recall of 79\% on mixed stones but misclassifies 20 of the 36 pure stones. At the 90\% threshold (b), the bias reverses: high recall on pure stones, low recall on mixed. Both thresholds show a tendency to predict the majority class.}
     \label{fig:confusion}
 \end{figure*}
 
 \begin{figure*}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/roc_comparison_test.png}
-    \caption{\textbf{ROC curves for Model A (binary classifier) on the held-out test set across purity thresholds.} The 100\% purity threshold (red, AUC = 0.715) and 90\% threshold (blue, AUC = 0.723) both substantially outperform the random-label baseline (green, AUC = 0.508). The 100\% threshold achieves higher and more stable cross-validation AUC (0.750 $\pm$ 0.026 vs.\ 0.719 $\pm$ 0.110); the marginal test-set reversal reflects the higher fold-to-fold variance at the 90\% threshold.}
+    \includegraphics[width=0.7\textwidth]{figures/roc_comparison_test.png}
+    \caption{\textbf{ROC curves for Model A (binary classifier) on the held-out test set across purity thresholds.} The 100\% purity threshold (red, AUC = 0.715) and 90\% threshold (blue, AUC = 0.723) both outperform the random-label baseline (green, AUC = 0.508). The 100\% threshold achieves higher and more stable cross-validation AUC (0.750 $\pm$ 0.026 vs.\ 0.719 $\pm$ 0.110). The higher AUC for 90\% in the test-set can be explained by the higher variance at the 90\% threshold.}
     \label{fig:roc}
 \end{figure*}
 
@@ -387,13 +387,13 @@ Table~\ref{tab:summary} brings together the key metrics across all three models 
         \toprule
         Model & Metric & Cross-validation & Test set \\
         \midrule
-        \textbf{Model A} & AUC-ROC & 0.750 $\pm$ 0.026 & 0.715 \\
+        Model A & AUC-ROC & 0.750 $\pm$ 0.026 & 0.715 \\
                          & F1      & 0.760 $\pm$ 0.036 & 0.734 \\
         \midrule
-        \textbf{Model B} & MAE (overall)    & 0.148 $\pm$ 0.004 & 0.182 \\
+        Model B & MAE (overall)    & 0.148 $\pm$ 0.004 & 0.182 \\
                          & Dominant macro F1 & 0.504 $\pm$ 0.062 & 0.483 \\
         \midrule
-        \textbf{Model C} & Macro F1 & 0.474 $\pm$ 0.064 & 0.430 \\
+        Model C & Macro F1 & 0.474 $\pm$ 0.064 & 0.430 \\
         \bottomrule
     \end{tabular}
 \end{table*}
@@ -404,9 +404,9 @@ We set out to investigate whether continuous mineral composition can be predicte
  
 \subsection*{Binary classification depends on the purity threshold}
  
-Model A achieved AUC values of 0.715 and 0.723 on the held-out test set at the 100\% and 90\% purity thresholds, respectively, with cross-validation AUCs of 0.750 $\pm$ 0.026 and 0.719 $\pm$ 0.110 (Figure~\ref{fig:roc}). On the surface these numbers look similar, but the confusion matrices (Figure~\ref{fig:confusion}) tell a more informative story. At the 100\% threshold, where mixed stones form the majority (65\%), the model correctly identifies 90\% of mixed stones while missing the majority of pure stones (44\% recall). When the threshold is relaxed to 90\%, the class balance inverts to 55\% pure and the bias flips: 77\% recall on pure, 58\% on mixed.
+Model A achieved AUC values of 0.715 and 0.723 on the held-out test set at the 100\% and 90\% purity thresholds, respectively, with cross-validation AUCs of 0.750 $\pm$ 0.026 and 0.719 $\pm$ 0.110 (Figure~\ref{fig:roc}). On the surface these numbers look similar, but the confusion matrices (Figure~\ref{fig:confusion}) tell a more informative story. At the 100\% threshold, where mixed stones form the majority (65\%), the model correctly identifies 79\% of mixed stones while missing the majority of pure stones (44\% recall) When the threshold is relaxed to 90\%, the class balance inverts to 55\% pure and the bias flips: 77\% recall on pure, 58\% on mixed.
  
-This pattern is not a model failure---it is a systematic consequence of moderate class imbalance. The model responds to the shift in prior by leaning toward whichever class dominates, rather than learning a truly threshold-invariant visual feature for purity. The substantially higher fold-to-fold variance at the 90\% threshold (AUC std = 0.110 vs. 0.026) is also telling: near-boundary stones---those with 89--91\% of a single mineral---look virtually identical regardless of which side of the cutoff they fall on, introducing label noise that destabilises training.
+This pattern is a systematic consequence of moderate class imbalance. The model is leaning toward whichever class dominates, rather than learning a truly threshold-invariant visual feature for purity. The substantially higher fold-to-fold variance at the 90\% threshold (AUC std = 0.110 vs. 0.026) is also telling: near-boundary stones---those with 89--91\% of a single mineral---look virtually identical regardless of which side of the cutoff they fall on, introducing label noise that destabilises training.
  
 From a clinical standpoint, the 100\% threshold is the more defensible choice. The urologists at Amsterdam UMC consider any detectable mixture clinically relevant to the lithogenic process \cite{Daudon2014}, and the tighter definition produces a cleaner training signal. At neither threshold does Model A reach the precision--recall balance needed for reliable standalone deployment, but its AUC of 0.715 demonstrates that genuine visual information about stone purity exists in ex vivo photographs and is recoverable from moderate-scale training data.
  
@@ -490,8 +490,8 @@ The weight $\lambda$ of the auxiliary presence detection loss was selected from 
         $\lambda$ & MAE & Macro F1 \\
         \midrule
         0.0 & 0.175 $\pm$ 0.009 & 0.45 $\pm$ 0.08 \\
-        0.1 & 0.171 $\pm$ 0.012 & 0.51 $\pm$ 0.05 \\
-        \textbf{0.3} & \textbf{0.163 $\pm$ 0.005} & \textbf{0.45 $\pm$ 0.12} \\
+        0.1 & 0.171 $\pm$ 0.012 & 0.45 $\pm$ 0.05 \\
+        0.3 & 0.163 $\pm$ 0.005 & 0.51 $\pm$ 0.12 \\
         0.5 & 0.174 $\pm$ 0.009 & 0.43 $\pm$ 0.11 \\
         1.0 & 0.164 $\pm$ 0.006 & 0.50 $\pm$ 0.07 \\
         \bottomrule
