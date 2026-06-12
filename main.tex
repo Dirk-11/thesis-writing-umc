@@ -168,12 +168,12 @@ Model A addresses the most basic clinical question: does this stone contain a mi
 
 All three models share the same backbone architecture and training procedure; they differ only in their output head and loss function. The full pipeline is config-driven and publicly available at \url{https://github.com/Dirkdeboer/umc_thesis}.
 
-\begin{figure*}[ht]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{figures/workflow_v3_3.png}
+    \includegraphics[width=\columnwidth]{figures/workflow_v3_3.png}
     \caption{\textbf{Overview of the three-model study design.} Starting from the MOCKI dataset (414 stones, three ex vivo photographs each, with FTIR composition labels), data were preprocessed into five-class composition vectors. Three ResNet18 models were trained in parallel: Model A (binary pure/mixed classifier, weighted CE loss), Model B (compositional regression, weighted KL + auxiliary BCE loss), and Model C (multiclass dominant-class classifier, weighted CE loss). Each model is evaluated with task-specific metrics and placed in context via two comparisons: a threshold comparison for Model A (90\% vs.\ 100\% purity definition) and a dominant-class comparison for Models B and C.}
     \label{fig:workflow}
-\end{figure*}
+\end{figure}
 
 \subsection*{Dataset}
 
@@ -294,12 +294,12 @@ After preprocessing and class consolidation, the dataset comprised 414 stones wi
  
 At the 100\% purity threshold, 146 stones (35\%) were labelled pure and 268 (65\%) mixed. At the 90\% threshold, this shifted to 229 pure (55\%) and 185 mixed (45\%), illustrating how sensitive the class balance is to the threshold definition.
  
-\begin{figure*}[ht]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/03_total_presence.png}
+    \includegraphics[width=\columnwidth]{figures/03_total_presence.png}
     \caption{\textbf{Mineral class presence across all composition positions.} Each bar shows how often a mineral class appears as the primary (dark), secondary (medium), or tertiary (light) component. Numbers indicate the total number of stones containing that class in any position, with the corresponding percentage of the full dataset. CaOx and CaP dominate, but their frequent co-occurrence as secondary components highlights the prevalence of mixed compositions.}
     \label{fig:presence}
-\end{figure*}
+\end{figure}
  
 \subsection*{Model A: binary classification of pure vs. mixed stones}
 
@@ -325,12 +325,12 @@ Even with inverse-frequency class weighting, the model shows residual bias towar
     \label{fig:confusion}
 \end{figure*}
 
-\begin{figure*}[ht]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{figures/roc_comparison_test.png}
+    \includegraphics[width=\columnwidth]{figures/roc_comparison_test.png}
     \caption{\textbf{ROC curves for Model A (binary classifier) on the held-out test set across purity thresholds.} The 100\% purity threshold (red, AUC = 0.715) and 90\% threshold (blue, AUC = 0.723) both outperform the random-label baseline (green, AUC = 0.508). The 100\% threshold achieves higher and more stable cross-validation AUC (0.750 $\pm$ 0.026 vs.\ 0.719 $\pm$ 0.110). The higher AUC for 90\% in the test-set can be explained by the higher variance at the 90\% threshold.}
     \label{fig:roc}
-\end{figure*}
+\end{figure}
 
 \begin{figure*}[ht]
     \centering
@@ -359,12 +359,12 @@ The composition model learned to predict continuous mineral fractions with varyi
  
 The violin plot reveals an important asymmetry in the errors. CaOx predictions are skewed below zero, meaning the model tends to underestimate calcium oxalate fractions. CaP shows the opposite pattern---a positive bias, with the model overestimating calcium phosphate. Since CaOx and CaP frequently co-occur in mixed stones and their fractions must sum to 1 (along with the other classes), this suggests the model struggles to correctly partition the composition between these two dominant classes. For the minority classes (UA, MAP, CYS), errors are more symmetric and concentrated near zero.
  
-\begin{figure*}[ht]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/simple_composition_error_violin_test.png}
+    \includegraphics[width=\columnwidth]{figures/simple_composition_error_violin_test.png}
     \caption{\textbf{Per-class prediction error distribution for Model B on the held-out test set.} Each violin shows the distribution of (predicted $-$ true) composition fractions. The horizontal line at zero indicates perfect prediction; the crossbar shows the median. MAE and Spearman's $\rho$ are annotated per class. CaOx and CaP show the widest error distributions, with CaOx systematically underpredicted and CaP overpredicted, suggesting the model struggles to partition composition between these co-occurring classes.}
     \label{fig:violin}
-\end{figure*}
+\end{figure}
  
 \subsection*{Model B vs. Model C: dominant class prediction}
  
@@ -372,12 +372,12 @@ To answer the second sub-question---whether the compositional regression model c
  
 The per-class breakdown reveals a consistent advantage for Model B. For CaOx, the two models perform comparably with Model C marginally ahead (F1 = 0.68 vs. 0.69), which is expected given that calcium oxalate is the largest class and visually distinctive. Model B outperformed Model C on CaP (F1 = 0.44 vs. 0.38) and UA (F1 = 0.46 vs. 0.35), and showed a smaller edge on CYS (F1 = 0.59 vs. 0.55). For MAP, the test set holds too few dominant stones (2) to read the F1 difference as a real effect, so we exclude it from this comparison. UA and CYS each have 8 dominant stones in the test set, so their per-class F1 estimates carry more uncertainty than CaP; the UA gap (0.11) is larger than the CYS gap (0.04) and more likely to reflect a real effect. Model B retains its advantage on the minority classes, suggesting that learning the full composition vector yields feature representations useful beyond the dominant class alone.
  
-\begin{figure*}[ht]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/f1_summary.png}
+    \includegraphics[width=\columnwidth]{figures/f1_summary.png}
     \caption{\textbf{Per-class F1 on the held-out test set for Model C (multiclass classifier), Model B (dominant class derived from composition), and a random-label baseline.} Both trained models substantially outperform the random baseline. Model B achieves macro F1 of 0.483 vs. 0.430 for Model C, and outperforms or matches Model C on CaOx, CaP, and UA; it shows a smaller advantage on CYS. MAP is shown for completeness but the test set contains only 2 dominant stones and cannot be interpreted. UA and CYS each have 8 dominant test-set stones.}
     \label{fig:f1summary}
-\end{figure*}
+\end{figure}
  
 \subsection*{Summary of results}
  
