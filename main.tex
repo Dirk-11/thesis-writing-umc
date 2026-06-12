@@ -511,4 +511,40 @@ The weight $\lambda$ of the auxiliary presence detection loss was selected from 
     \label{fig:losscurves}
 \end{figure*}
 
+\section{Backbone selection: ResNet50 overfitting}
+\label{app:resnet50}
+
+We evaluated ResNet50 as an alternative backbone to ResNet18. With the same staged fine-tuning protocol (Phase~1: frozen backbone; Phase~2: full fine-tuning), ResNet50 overfit severely on the MOCKI dataset: training loss continued to drop sharply after backbone unfreezing while validation loss increased, indicating that the larger model capacity exceeded what the dataset size could support. ResNet18 showed stable convergence (Figure~\ref{fig:losscurves}) and was therefore selected.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/training_curves_resnet50.png}
+    \caption{\textbf{ResNet50 Model A training curves showing overfitting.} After backbone unfreezing (dashed line), training loss drops sharply while validation loss rises, indicating the model is memorising the training set. Mean $\pm$1 SD across five cross-validation folds. This behaviour motivated the choice of ResNet18 as the backbone architecture.}
+    \label{fig:resnet50}
+\end{figure}
+
+\section{Model C confusion matrix}
+\label{app:confusion_c}
+
+Figure~\ref{fig:confusion_c} shows the per-class confusion matrix for Model C (multiclass classifier) on the held-out test set. CaOx and CYS show the strongest recall (65\% and 75\% respectively), while CaP recall is limited to 38\%, consistent with its overlap with CaOx in mixed stones. MAP has only two test stones and its result should be interpreted with caution.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/confusion_matrix_test_multiclass.png}
+    \caption{\textbf{Confusion matrix for Model C (multiclass classifier) on the held-out test set.} Colour intensity reflects raw counts; percentages indicate row-normalised recall per class. CaP recall is limited by its frequent co-occurrence with CaOx in mixed stones.}
+    \label{fig:confusion_c}
+\end{figure}
+
+\section{Model B predicted vs.\ true composition}
+\label{app:scatter_b}
+
+Figure~\ref{fig:scatter_b} shows predicted versus true mineral fractions for Model B on the held-out test set. Points close to the diagonal indicate accurate predictions. CaOx and CaP show the widest spread, reflecting the difficulty of partitioning fractions between co-occurring dominant minerals. Minority classes (UA, MAP, CYS) cluster near zero because most stones contain little or none of these minerals, but the model captures the relative ordering (Spearman $\rho = 0.45$--$0.67$).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/simple_composition_scatter_test.png}
+    \caption{\textbf{Model B predicted vs.\ true mineral fractions on the held-out test set.} Each panel shows one mineral class; the diagonal is the line of perfect prediction. MAE and Spearman $\rho$ are annotated per class. Post-processing retains the top-3 predicted fractions per stone (the remaining are set to zero and the vector is renormalised).}
+    \label{fig:scatter_b}
+\end{figure}
+
 \end{document}
