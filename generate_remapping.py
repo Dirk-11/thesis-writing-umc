@@ -179,7 +179,7 @@ raw = [
     ("UA (36)",   0.285, "UA"),
     ("MAP (11)",  0.185, "MAP"),
     ("CYS (39)", 0.090, "CYS"),
-    ("OTH (12*)", 0.000, "OTH"),
+    ("OTH (4)",   0.000, "OTH"),
 ]
 shift = 0.0  # positions already absolute
 
@@ -193,7 +193,7 @@ targets = [
     ("UA",   "Uric acid",          0.285),
     ("MAP",  "Struvite",           0.185),
     ("CYS",  "Cystine",            0.090),
-    ("OTH",  "Remaining OTH",      0.000),
+    ("OTH",  "Excluded (B & C)",   0.000),
 ]
 targets = [(n, s, y + shift) for n, s, y in targets]
 
@@ -201,7 +201,7 @@ for name, sub, y in targets:
     rounded_box(ax2, RX2, y, BW2R, 0.090, name, sub, color=COLORS[name], fs=9)
 
 # Build lookup
-raw_y   = {n.split(" (")[0].rstrip("*"): y for n, y, c in raw}
+raw_y   = {n.split(" (")[0]: y for n, y, c in raw}
 tgt_y   = {n: y for n, s, y in targets}
 
 # Arrow definitions: (raw_key, target, label, label_dy)
@@ -240,7 +240,7 @@ for raw_key, tgt_key, lbl, lbl_dy in arrows:
 
 # OTH footnote
 ax2.text(0.50, 0.022,
-         "* After OTH subtype reclassification: 30 → UA · 4 → CaP · 1 → MAP · 34 remain OTH",
+         "OTH (4): remaining after sub-identification reclassified 30 → UA · 4 → CaP · 1 → MAP; excluded from Models B & C",
          ha="center", va="center", fontsize=7, color="#666666",
          transform=ax2.transAxes)
 
