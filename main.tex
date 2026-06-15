@@ -309,7 +309,7 @@ The 100\% threshold did slightly better and varied less across folds. This may s
 
 Even with inverse-frequency class weighting, the model still leans toward the majority class at both thresholds (Figure~\ref{fig:confusion}). At 100\%, recall on mixed stones stays higher than on pure stones (79\% vs.\ 44\%); at 90\% the pattern flips (77\% pure recall vs.\ 58\% mixed). This comes down to the visual difficulty near the boundary. Stones that are borderline pure or mixed look nearly identical whichever side they fall on, and class weighting can move the decision boundary but cannot recover information that is not in the image.
 
-\begin{figure*}[ht]
+\begin{figure*}[t]
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
@@ -364,7 +364,7 @@ The per-class scores favor Model B in most classes. On CaOx the two are similar,
 
 Table~\ref{tab:summary} brings together the key metrics for all three models on both cross-validation and the held-out test set.
 
-\begin{table*}[ht]
+\begin{table*}[t]
     \centering
     \caption{\textbf{Summary of model performances.} The cross-validation results are reported as mean $\pm$ standard deviation across five folds. The test set results are from the held-out 20\% of stones. Model A is evaluated at the 100\% purity threshold. For Model B, dominant class metrics are derived by taking the argmax of the predicted composition vector.}
     \label{tab:summary}
@@ -383,6 +383,7 @@ Table~\ref{tab:summary} brings together the key metrics for all three models on 
     \end{tabular}
 \end{table*}
 
+\FloatBarrier
 \section*{Discussion}
  
 This study asked whether continuous mineral composition can be predicted from ex vivo kidney stone photographs, as an alternative to the discrete classification framing used in all prior approaches. The result is a proof of concept, with limitations. Model B learns to rank mineral fractions with Spearman correlations of up to 0.67 for calcium oxalate and 0.51 for calcium phosphate, and reaches a dominant-class macro F1 on par with a dedicated multiclass classifier (0.483 vs.\ 0.430 on the held-out test set). These results establish compositional regression as a viable and informative task, even on a dataset of the size available here.
@@ -425,7 +426,7 @@ The performance of our models are not good enough to use in the clinic. It could
 \subsection*{Comparison to prior work}
  
 No previous study has tried to predict continuous composition from kidney stone photographs, so there's nothing in the literature we can compare against directly. Our Model C results serve as a conventional classification benchmark on the same data.
-Kim et al.\ used multiclass deep learning on ex vivo photographs, sorting 965 stones into four composition groups (pure COM, COM+struvite, COM+COD, and pure UA), with per-class sensitivity of 85--95\% \cite{Kim2022}. Black et al.\ trained ResNet-101 on 63 ex vivo images across five mineral classes (COM, UA, struvite, brushite, cystine) and reported 85\% weighted recall \cite{Black2020}. The Ochoa-Ruiz group identified six stone types from in vivo endoscopic images using two-step transfer learning, pretraining on ex vivo images and fine-tuning on endoscopic ones, and reached weighted accuracy as high as 97\% \cite{LopezTiro2021, LopezTiro2024}. Veltheer took a similar two-step approach on Serrat's ex vivo myStone dataset (six Daudon morphological classes) with a ResNet50 backbone \cite{veltheer2025}. None of these numbers is really comparable to ours. The studies use different class counts (4--6 against our 5), different datasets, different imaging modalities, and different metrics, and none reports macro F1 on a five-class ex vivo task like ours.
+Kim et al.\ used multiclass deep learning on ex vivo photographs, sorting 965 stones into four composition groups (pure COM, COM+struvite, COM+COD, and pure UA), with per-class sensitivity of 85--95\% \cite{Kim2022}. Black et al.\ trained ResNet-101 on 63 ex vivo images across five mineral classes (COM, UA, struvite, brushite, cystine) and reported 85\% weighted recall \cite{Black2020}. The Ochoa-Ruiz group identified six stone types from in vivo endoscopic images using two-step transfer learning, pretraining on ex vivo images and fine-tuning on endoscopic ones, and reached weighted accuracy as high as 97\% \cite{LopezTiro2021, LopezTiro2024}. Veltheer took a similar two-step approach on Serrat's ex vivo myStone dataset (six Daudon morphological classes) with a ResNet50 backbone, achieving a soft-voted macro F1 of 0.59 across those six classes \cite{veltheer2025}. None of these numbers is directly comparable to our Model C (macro F1 = 0.430). The studies use different class counts (4--6 against our 5), different datasets, and different imaging modalities. Veltheer's macro F1 is the closest metric to ours but still cannot be compared directly: the six morphological classes on Serrat's dataset differ both in number and definition from our five FTIR chemical classes on MOCKI---HAP, STR, and BRU do not map cleanly to our CaP and MAP.
 The nearest methodological parallel is outside urology altogether. Ruf et al.\ predicted continuous mineral fractions from geological drill core images with a pretrained CNN, working from 361 labelled image segments \cite{Ruf2024}. They found that co-occurring minerals with similar textures are the hardest to tell apart, and their overall MAE sits in the same range as ours. Both points are reassuring: they suggest the compositional regression idea holds up in image-based mineral analysis generally, not just in our particular setting.
  
 \subsection*{Limitations}
