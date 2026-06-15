@@ -309,7 +309,7 @@ The 100\% threshold did slightly better and varied less across folds. This may s
 
 Even with inverse-frequency class weighting, the model still leans toward the majority class at both thresholds (Figure~\ref{fig:confusion}). At 100\%, recall on mixed stones stays higher than on pure stones (79\% vs.\ 44\%); at 90\% the pattern flips (77\% pure recall vs.\ 58\% mixed). This comes down to the visual difficulty near the boundary. Stones that are borderline pure or mixed look nearly identical whichever side they fall on, and class weighting can move the decision boundary but cannot recover information that is not in the image.
 
-\begin{figure*}[t]
+\begin{figure*}[ht]
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
@@ -364,7 +364,7 @@ The per-class scores favor Model B in most classes. On CaOx the two are similar,
 
 Table~\ref{tab:summary} brings together the key metrics for all three models on both cross-validation and the held-out test set.
 
-\begin{table*}[t]
+\begin{table}[ht]
     \centering
     \caption{\textbf{Summary of model performances.} The cross-validation results are reported as mean $\pm$ standard deviation across five folds. The test set results are from the held-out 20\% of stones. Model A is evaluated at the 100\% purity threshold. For Model B, dominant class metrics are derived by taking the argmax of the predicted composition vector.}
     \label{tab:summary}
@@ -372,16 +372,16 @@ Table~\ref{tab:summary} brings together the key metrics for all three models on 
         \toprule
         Model & Metric & Cross-validation & Test set \\
         \midrule
-        Model A & AUC-ROC & $0.750 \pm 0.026$ & 0.715 \\
+        A & AUC-ROC & $0.750 \pm 0.026$ & 0.715 \\
                          & F1      & $0.760 \pm 0.036$ & 0.734 \\
         \midrule
-        Model B & MAE (overall)    & $0.148 \pm 0.004$ & 0.182 \\
-                         & Dominant macro F1 & $0.504 \pm 0.062$ & 0.483 \\
+        B & MAE    & $0.148 \pm 0.004$ & 0.182 \\
+                         & Dom. F1 & $0.504 \pm 0.062$ & 0.483 \\
         \midrule
-        Model C & Macro F1 & $0.474 \pm 0.064$ & 0.430 \\
+        C & Macro F1 & $0.474 \pm 0.064$ & 0.430 \\
         \bottomrule
     \end{tabular}
-\end{table*}
+\end{table}
 
 \FloatBarrier
 \section*{Discussion}
