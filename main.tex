@@ -186,7 +186,7 @@ The raw clinical data needed four cleaning steps before it could be used for mod
 
 The raw FTIR data distinguishes nine mineral classes, but reliably separating all nine from photographs of only 414 stones would leave too few training examples per class. Prior automated kidney stone recognition studies have consistently worked with 4--6 target classes \cite{Black2020, Kim2022, LopezTiro2021, veltheer2025}. In consultation with the urologists at Amsterdam UMC, we therefore consolidated the nine raw FTIR classes into six target classes through a two-stage remapping (Figure~\ref{fig:remapping}). In the first stage, we examined stones labelled as ``OTH'' (other) using the FTIR sub-identification field. Where the mineral could be chemically identified, we reassigned it to the appropriate class: urate salts and uric acid dihydrate (30 stones) were assigned to UA, calcium-magnesium phosphate (4 stones) to CaP, and newberyite (1 stone) to MAP. The remaining OTH stones---calcite, protein, and xanthine---stayed as OTH because they have no clear chemical relationship to the major classes. In the second stage, we merged subtypes into final classes: COM and COD into CaOx, CHP, CHPD, and CMP into CaP, with UA, MAP, and CYS remaining as individual classes.
 
-For Models B and C, the OTH class was excluded in two steps, as shown in Figure~\ref{fig:remapping}. First, the 4 stones with OTH as their dominant component were removed entirely, as the class is chemically heterogeneous and too small to train or evaluate reliably. Second, for the 32 stones where OTH appeared only as a secondary or tertiary component, the OTH fraction was dropped from the composition vector and the remaining five-class fractions were renormalised to sum to 1. This means the regression targets for these stones do not represent the OTH component; the fraction is absorbed into the dominant mineral. For 30 of these 32 stones the OTH fraction is 0.2, so the distortion is modest; the remaining two carry an OTH fraction of 0.4. After applying both steps, 410 stones distributed across 5 target classes remain.
+For Models B and C, the OTH class was excluded in two steps, as shown in Figure~\ref{fig:remapping}. First, the 4 stones with OTH as their dominant component were removed entirely, as the class is chemically heterogeneous and too small to train or evaluate reliably. Second, for the 32 stones where OTH appeared only as a secondary or tertiary component, the OTH fraction was dropped from the composition vector and the remaining five-class fractions were renormalized to sum to 1. This means the regression targets for these stones do not represent the OTH component; the fraction is absorbed into the dominant mineral. For 30 of these 32 stones the OTH fraction is 0.2, so the distortion is modest; the remaining two carry an OTH fraction of 0.4. After applying both steps, 410 stones distributed across 5 target classes remain.
 
 \begin{figure*}[t]
     \centering
@@ -197,7 +197,7 @@ For Models B and C, the OTH class was excluded in two steps, as shown in Figure~
 
 \subsubsection*{Composition vectors and purity labels}
 
-For each stone, we built a composition vector by summing the FTIR percentages from all positions (primary, secondary, tertiary) into the matching class bucket, then normalising the vector to sum to 1.0. This normalised vector is the regression target for Model B, and its argmax gives the dominant class label for Model C.
+For each stone, we built a composition vector by summing the FTIR percentages from all positions (primary, secondary, tertiary) into the matching class bucket, then normalising the vector to sum to 1.0. This normalized vector is the regression target for Model B, and its argmax gives the dominant class label for Model C.
 
 Stones whose composition was 100\% a single mineral were labelled \textit{pure}; the rest were labelled \textit{mixed}. We chose this strict threshold in consultation with the urologists at Amsterdam UMC, who treat any detectable mixture as clinically relevant. Prior work has used a looser threshold of 90\% \cite{Kim2022}, so we evaluate Model A at both thresholds and compare the effect on classification performance.
 
@@ -238,7 +238,7 @@ Composition targets with a true fraction of zero use the conventional $0 \log 0 
 
 The auxiliary presence head has the same architecture but outputs independent sigmoid activations, one per class, predicting whether each mineral is present in the stone. It is trained with binary cross-entropy loss and gives an extra training signal that pushes the backbone to learn features sensitive to minority components, which might otherwise be ignored because their fractions are small. The total loss combines the two terms with a weight of 0.3 on the auxiliary loss. We selected this value from \{0.0, 0.1, 0.3, 0.5, 1.0\} based on validation MAE and macro F1 (Appendix~\ref{app:lambda}).
 
-At inference time, the composition predictions from the three photos of a stone are averaged and re-normalised to sum to 1.
+At inference time, the composition predictions from the three photos of a stone are averaged and re-normalized to sum to 1.
 
 \subsubsection*{Model C: multiclass classifier}
 
@@ -278,7 +278,7 @@ Training was done on an NVIDIA A100 GPU using the Snellius HPC cluster (SURF), w
 
 All metrics are computed at the stone level after combining the predictions across the three photos.
 
-For Model A, we report AUC-ROC as the main metric. For Model B, we apply top-3 post-processing to the raw softmax output before computing metrics. The two smallest predicted fractions per stone are set to zero and the rest are renormalised to sum to one, which reflects the fact that every stone in our dataset contains at most three mineral components. We then report MAE and Spearman's $\rho$ between the post-processed predictions and the FTIR ground truth, both per class and overall. To compare Model B directly against Model C, we also derive a dominant-class prediction from Model B by taking the class with the highest predicted fraction, and compute macro-F1 and per-class F1 for both models on this shared task. For Model C, we report macro-F1 and per-class F1.
+For Model A, we report AUC-ROC as the main metric. For Model B, we apply top-3 post-processing to the raw softmax output before computing metrics. The two smallest predicted fractions per stone are set to zero and the rest are renormalized to sum to one, which reflects the fact that every stone in our dataset contains at most three mineral components. We then report MAE and Spearman's $\rho$ between the post-processed predictions and the FTIR ground truth, both per class and overall. To compare Model B directly against Model C, we also derive a dominant-class prediction from Model B by taking the class with the highest predicted fraction, and compute macro-F1 and per-class F1 for both models on this shared task. For Model C, we report macro-F1 and per-class F1.
 
 For each model, we also report a random-label baseline. Here an identical model is trained on data where the stone labels have been randomly permuted at the stone level, so all three photographs of a stone get the same shuffled label. This keeps the within-stone consistency but destroys any link between visual features and composition. The baseline is then trained and evaluated exactly like the main model. Comparing against it confirms that the trained model's performance comes from real visual learning rather than distributional artifacts or data leakage.
 
@@ -513,7 +513,7 @@ We evaluated ResNet50 as an alternative backbone to ResNet18. With the same stag
 \begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{figures/training_curves_resnet50.png}
-    \caption{\textbf{ResNet50 Model A training curves showing overfitting.} After backbone unfreezing (dashed line), training loss drops sharply while validation loss rises, indicating the model is memorising the training set. Mean $\pm$1 SD across five cross-validation folds. This behaviour motivated the choice of ResNet18 as the backbone architecture.}
+    \caption{\textbf{ResNet50 Model A training curves showing overfitting.} After backbone unfreezing (dashed line), training loss drops sharply while validation loss rises, indicating the model is memorizing the training set. Mean $\pm$1 SD across five cross-validation folds. This behavior motivated the choice of ResNet18 as the backbone architecture.}
     \label{fig:resnet50}
 \end{figure}
 
@@ -525,7 +525,7 @@ Figure~\ref{fig:confusion_c} shows the per-class confusion matrix for Model C (m
 \begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{figures/confusion_matrix_test_multiclass.png}
-    \caption{\textbf{Confusion matrix for Model C (multiclass classifier) on the held-out test set.} Colour intensity reflects raw counts; percentages indicate row-normalised recall per class. CaP recall is limited by its frequent co-occurrence with CaOx in mixed stones.}
+    \caption{\textbf{Confusion matrix for Model C (multiclass classifier) on the held-out test set.} Color intensity reflects raw counts; percentages indicate row-normalized recall per class. CaP recall is limited by its frequent co-occurrence with CaOx in mixed stones.}
     \label{fig:confusion_c}
 \end{figure}
 
@@ -537,7 +537,7 @@ Figure~\ref{fig:scatter_b} shows predicted versus true mineral fractions for Mod
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\columnwidth]{figures/simple_composition_scatter_test.png}
-    \caption{\textbf{Model B predicted vs.\ true mineral fractions on the held-out test set.} Each panel shows one mineral class; the diagonal is the line of perfect prediction. MAE and Spearman $\rho$ are annotated per class. Post-processing retains the top-3 predicted fractions per stone (the remaining are set to zero and the vector is renormalised).}
+    \caption{\textbf{Model B predicted vs.\ true mineral fractions on the held-out test set.} Each panel shows one mineral class; the diagonal is the line of perfect prediction. MAE and Spearman $\rho$ are annotated per class. Post-processing retains the top-3 predicted fractions per stone (the remaining are set to zero and the vector is renormalized).}
     \label{fig:scatter_b}
 \end{figure}
 
