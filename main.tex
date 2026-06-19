@@ -130,7 +130,7 @@ Another option is to estimate composition based on the stone’s visual characte
 
 This is where deep learning becomes relevant. Multiple groups have shown that convolutional neural networks (CNNs) can classify kidney stone types from photographs with reasonable accuracy. Most of this work has focused on in vivo endoscopic images: the group of Ochoa-Ruiz and Daul explored CNN-based classification, two-step transfer learning, and metric learning on ureteroscopic images \cite{LopezTiro2021, LopezTiro2024, GonzalezZapata2024}, while Estrade demonstrated recognition of pure and mixed stone morphologies from both still images and video \cite{Estrade2022, Estrade2022video}. Other groups have worked with ex vivo photographs taken after stone extraction \cite{Black2020}. Kim et al. classified ex vivo stone photographs by dominant composition type \cite{Kim2022}, and Serrat et al. built a classification model for retrieved stones \cite{Serrat2017}. Zhu et al. developed models using intraoperative images to predict composition in real time \cite{Zhu2024}, Leng et al. combined segmentation and classification from endoscopic video \cite{Leng2024}, and Onal and Tekgul explored smartphone-based microscopy \cite{Onal2022}. A comprehensive benchmark of these approaches was provided by El Beze et al. \cite{ElBeze2022}.
 
-\subsection*{Classification vs. continuous composition}
+\paragraph{}
 
 Despite this progress, these methods approach the problem as a classification task. The model classifies each stone to a mineral category or to a predefined mixture category from the Daudon system, and then produces a discrete label as output. This method ignores continuous mineralogical composition measured by FTIR.
 
