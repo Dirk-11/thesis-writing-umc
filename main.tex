@@ -103,11 +103,11 @@
 \twocolumn[
 \begin{@twocolumnfalse}
 \begin{abstract}
-Kidney stone composition determines treatment strategy and recurrence risk, yet other approaches assign stones to discrete mineral categories, discarding the continuous compositional information measured by Fourier transform infrared (FTIR) spectroscopy. We present the a deep learning study to predict continuous FTIR-calibrated mineral composition percentages directly from ex vivo kidney stone photographs.
+Kidney stone composition determines treatment strategy and recurrence risk, yet other approaches assign stones to discrete mineral categories, discarding the continuous compositional information measured by Fourier transform infrared (FTIR) spectroscopy. We present a deep learning study to predict continuous FTIR-calibrated mineral composition percentages directly from ex vivo kidney stone photographs.
  
 Three models were trained on 414 stones: a binary pure/mixed classifier (Model A), a compositional regression model predicting five-class mineral fractions using KL divergence loss with an auxiliary presence detection head (Model B), and a multiclass classifier serving as a controlled baseline (Model C). All models share a ResNet18 backbone with two-phase staged fine-tuning and are evaluated under five-fold cross-validation and a held-out test set.
  
-Model A distinguished pure from mixed stones with AUC = 0.715 on the test set at the 100\% purity threshold, with performance biased toward the majority class at both thresholds. Model B predicted calcium oxalate and calcium phosphate fractions with Spearman correlations of 0.67 and 0.51, respectively. It got a dominant-class macro F1 of 0.483, comparable to Model C (0.430) and it also predicts the full composition of the stone. Model B outperformed Model C on calcium phosphate (F1 = 0.44 vs. 0.38) and uric acid (F1 = 0.46 vs. 0.35), and showed a smaller advantage on cystine (F1 = 0.59 vs. 0.55). This suggests that learning the full composition teaches the model something more useful than just the main mineral.
+Model A distinguished pure from mixed stones with AUC = 0.715 on the test set at the 100\% purity threshold, with performance biased toward the majority class at both thresholds. Model B predicted calcium oxalate and calcium phosphate fractions with Spearman correlations of 0.67 and 0.51, respectively. It achieved a dominant-class macro F1 of 0.483, comparable to Model C (0.430) and it also predicts the full composition of the stone. Model B outperformed Model C on calcium phosphate (F1 = 0.44 vs. 0.38) and uric acid (F1 = 0.46 vs. 0.35), and showed a smaller advantage on cystine (F1 = 0.59 vs. 0.55). This suggests that learning the full composition teaches the model something more useful than just the main mineral.
 
 These results show that continuous mineral composition is learnable from stone photographs, and that the regression framing is competitive with direct classification. Current accuracy is not yet sufficient for clinical deployment, but the approach provides a foundation for future work with larger datasets and an extension to in vivo endoscopic imaging.
 \end{abstract}
@@ -288,7 +288,7 @@ All code, configuration files, and training scripts are available at \url{https:
 
 \section*{Results}
 
-\subsection*{Dataset characteristics}
+\subsection*{Dataset}
 
 After preprocessing and class merging, the dataset comprised 414 stones with valid composition vectors across six mineral classes including OTH (Figure~\ref{fig:presence}). The four OTH-dominant stones are dropped for the composition models (Models B and C), which leaves five target classes across 410 stones. CaOx was the dominant mineral in 199 stones (48\%) and CaP in 121 (29\%), so the two together account for 77\% of dominant-class assignments. UA, MAP, CYS, and OTH each appeared as the primary component in fewer than 10\% of stones. CaP also turned up as a secondary or tertiary component in 109 stones (26\%), against only 39 stones (9\%) for CaOx, which shows how often CaP sits alongside another mineral in a mixed stone.
 
@@ -335,8 +335,7 @@ Even with inverse-frequency class weighting, the model still leans toward the ma
 Training and validation loss curves for all three models are provided in Appendix~\ref{app:losscurves}.
 
 \subsection*{Model B: compositional regression}
-
-The predicting performance of model B varied a lot by class (Figure~\ref{fig:violin}). On the held-out test set, CaOx was the strongest (MAE $= 0.295$, $\rho = 0.67$), followed by CaP (MAE $= 0.260$, $\rho = 0.51$). These are the two classes with the most training signal, together making up 77\% of dominant-class assignments (CaOx 48\%, CaP 29\%) and covering the widest range of true fractions. UA, MAP, and CYS had lower MAE values (0.169, 0.078, and 0.107), partly because their true fraction is zero in any stone where the mineral is absent, which leaves less room for large errors. Their rank correlations were still moderate to strong ($\rho$ between 0.45 and 0.60), so the model orders stones sensibly even for the minority classes. The random-label baseline gave MAE $= 0.432$ for CaOx ($\rho = -0.07$) and MAE $= 0.290$ for CaP ($\rho = 0.13$). This shows that the model's errors and correlations come from real visual learning rather than the shape of the composition distribution.
+The prediction performance of model B varied a lot by class (Figure~\ref{fig:violin}). On the held-out test set, CaOx was the strongest (MAE $= 0.295$, $\rho = 0.67$), followed by CaP (MAE $= 0.260$, $\rho = 0.51$). These are the two classes with the most training signal, together making up 77\% of dominant-class assignments (CaOx 48\%, CaP 29\%) and covering the widest range of true fractions. UA, MAP, and CYS had lower MAE values (0.169, 0.078, and 0.107), partly because their true fraction is zero in any stone where the mineral is absent, which leaves less room for large errors. Their rank correlations were still moderate to strong ($\rho$ between 0.45 and 0.60), so the model orders stones sensibly even for the minority classes. The random-label baseline gave MAE $= 0.432$ for CaOx ($\rho = -0.07$) and MAE $= 0.290$ for CaP ($\rho = 0.13$). This shows that the model's errors and correlations come from real visual learning rather than the shape of the composition distribution.
 
 The violin plot shows an asymmetry in the errors. CaOx predictions skew below zero, so the model tends to underestimate calcium oxalate, while CaP skews the other way and gets overestimated. Because CaOx and CaP co-occur in many mixed stones and the fractions have to sum to one, the model has trouble splitting the composition between the two. For the minority classes (UA, MAP, CYS) the errors are more symmetric and sit close to zero.
 
@@ -356,13 +355,13 @@ The per-class scores favor Model B in most classes. On CaOx the two are similar,
 \begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{figures/f1_summary.png}
-    \caption{\textbf{Per-class F1 on the held-out test set for Model C, Model B, and a random-label baseline.} Both trained models clearly beat the random baseline. Model B reaches a macro F1 of 0.483 against 0.430 for Model C, and matches or outperforms it on CaOx, CaP, UA, and CYS. MAP is shown for completeness but its test set (2 dominant stones) is too small to interpret.}
+    \caption{\textbf{Per-class F1 on the held-out test set for Model C, Model B, and a random-label baseline.} Both trained models clearly beat the random baseline. Model B reaches a macro F1 of 0.483 against 0.430 for Model C, and matches or outperforms it on all classes}
     \label{fig:f1summary}
 \end{figure}
 
 \subsection*{Summary of results}
 
-Table~\ref{tab:summary} brings together the key metrics for all three models on both cross-validation and the held-out test set.
+Table~\ref{tab:summary} shows the main results for all three models on both cross-validation and the held-out test set.
 
 \begin{table}[ht]
     \centering
@@ -376,7 +375,7 @@ Table~\ref{tab:summary} brings together the key metrics for all three models on 
                          & F1      & $0.760 \pm 0.036$ & 0.734 \\
         \midrule
         B & MAE    & $0.148 \pm 0.004$ & 0.182 \\
-                         & Dom. F1 & $0.504 \pm 0.062$ & 0.483 \\
+                         & Macro F1 & $0.504 \pm 0.062$ & 0.483 \\
         \midrule
         C & Macro F1 & $0.474 \pm 0.064$ & 0.430 \\
         \bottomrule
@@ -402,15 +401,15 @@ The central question of this thesis was whether a model can predict continuous F
 
 Beyond confirming that learning happened, the continuous output carries qualitatively different information from a class label. A classifier can only say that a stone is CaOx-dominant; Model B additionally estimates that it is, say, 70\% CaOx and 25\% CaP. That distinction has clinical weight, and the continuous output is also well suited to tracking composition changes in recurrent stone formers over time, where the question is not which mineral dominates but whether the balance is shifting. Neither use case is available to a classification model.
 
-The absolute errors are larger than clinical use would need. An MAE of 0.295 for CaOx means predictions are off by about 30 percentage points on average, enough that the model cannot reliably tell a 60\% CaOx stone from a 90\% one. This is the honest current limitation of the approach. It should be read alongside the dataset constraints, though. With 414 stones, small by deep learning standards, most of the training signal sits in the two dominant classes. The error level is consistent with what Ruf et al.\ found in the analogous task of predicting mineral fractions from geological drill core images at comparable dataset sizes \cite{Ruf2024}, and their study also showed per-mineral MAE dropping substantially as training data grows.
+The absolute errors remain too large for clinical use. An MAE of 0.295 for CaOx means predictions are off by about 30 percentage points on average, enough that the model cannot reliably tell a 60\% CaOx stone from a 90\% one. This is the honest current limitation of the approach. It should be read alongside the dataset constraints, though. With 414 stones, small by deep learning standards, most of the training signal sits in the two dominant classes. The error level is consistent with what Ruf et al.\ found in the analogous task of predicting mineral fractions from geological drill core images at comparable dataset sizes \cite{Ruf2024}, and their study also showed per-mineral MAE dropping substantially as training data grows.
 
-The per-class error distributions reveal a structural pattern worth dwelling on (Figure~\ref{fig:violin}). CaOx predictions are biased downward while CaP predictions are biased upward. The two classes co-occur in over half the stones in our dataset, and because the softmax fractions must sum to one, overestimating one necessarily depresses the other. The model seems to learn a reasonable dominant-class signal for CaOx and CaP separately, but it has too few examples of intermediate mixed compositions to split the two fractions correctly when both are large. A similar confusion between co-occurring classes was reported by Ruf et al.\ \cite{Ruf2024}, and by the Ochoa-Ruiz group for in vivo images where COM and CHP co-occur \cite{LopezTiro2024}. This CaOx--CaP confusion matters clinically, since Daudon has argued that even minor CaP content can point to specific metabolic dysfunctions such as tubular acidification defects, where the difference between 10\% and 40\% secondary CaP carries real diagnostic weight \cite{Daudon2014}.
+The per-class error distributions reveal a structural pattern worth mentioning (Figure~\ref{fig:violin}). CaOx predictions are biased downward while CaP predictions are biased upward. The two classes co-occur in over half the stones in our dataset, and because the softmax fractions must sum to one, overestimating one necessarily leads to underestimation of the other. The model seems to learn a reasonable dominant-class signal for CaOx and CaP separately, but it has too few examples of intermediate mixed compositions to split the two fractions correctly when both are large. A similar confusion between co-occurring classes was reported by Ruf et al.\ \cite{Ruf2024}, and by the Ochoa-Ruiz group for in vivo images where COM and CHP co-occur \cite{LopezTiro2024}. This CaOx--CaP confusion matters clinically, since Daudon has argued that even minor CaP content can point to specific metabolic dysfunctions such as tubular acidification defects, where the difference between 10\% and 40\% secondary CaP carries real diagnostic weight \cite{Daudon2014}.
 
 For the minority classes, the model achieves lower MAE values (UA $= 0.169$, MAP $= 0.078$, CYS $= 0.107$), partly because stones without these minerals have a true fraction of zero by definition, which leaves less room for large absolute errors. The moderate correlations suggest the model picks up enough visual signal to rank stones within these classes, though the test set holds only 2 MAP-dominant stones, so the dominant-class F1 for MAP should be read as indicative only.
  
 \subsection*{Model B matches model C for classification}
  
-Comparing Model B and Model C on the shared task of dominant class prediction directly addresses the second sub-question. Both achieved macro F1 above 0.40 on the test set (0.483 and 0.430 for Models B and C, respectively), 4.0 and 3.6 times the random-label baseline (0.120). The question is whether the regression framing actually buys anything beyond direct classification.
+Comparing Model B and Model C on the shared task of dominant class prediction directly addresses the second sub-question. Both achieved macro F1 above 0.40 on the test set (0.483 and 0.430 for Models B and C, respectively), 4.0 and 3.6 times the random-label baseline (0.120).
  
 For CaOx the two models are about even, with Model C marginally ahead (F1 = 0.68 vs. 0.69). On CaP the gap opens up in Model B's favour (F1 = 0.44 vs. 0.38). We think this happens because Model B is trained on the full composition vector rather than a single label, so it builds a more detailed internal picture of CaP-containing stones, and that picture carries over to the dominant-class task. Knowing how much CaP a stone contains, even when CaOx dominates, helps the model spot the cases where CaP tips over into the majority. Model C never sees anything but the dominant label, so it has no way to pick this up.
 
@@ -420,7 +419,7 @@ Taken together, Model B does everything Model C does on the common classes and a
 
 \subsection*{Clinical relevance}
  
-The clinical reason for doing this is that stone composition isn't really a category, even though existing methods treat it as one. Daudon has shown that the FTIR percentages carry useful information beyond just the dominant mineral. Within the calcium oxalate fraction, the balance of COM to COD reflects how severe the oxaluria is, and the mix of CaP sub-types reflects tubular acidification status \cite{Daudon2014}.
+The clinical reason for doing this is that stone composition isn't really categorical, even though existing methods treat it as such. Daudon has shown that the FTIR percentages carry useful information beyond just the dominant mineral. Within the calcium oxalate fraction, the balance of COM to COD reflects how severe the oxaluria is, and the mix of CaP sub-types reflects tubular acidification status \cite{Daudon2014}.
 The performance of our models are not good enough to use in the clinic. It could still be useful as a screening tool, though. Telling a clinician that a stone is roughly 70\% CaOx with 25\% CaP says more than just labelling it a "calcium oxalate stone," even when the exact fractions are off. A rough composition estimate during ureteroscopy, before the stone is removed and sent for FTIR, could help with decisions on how to fragment the stone and where to sample it. Model B keeps up with a dedicated classifier on dominant-class prediction and gives the composition estimate on top of that, which is encouraging given the modest dataset and the fact that we used nothing more elaborate than a standard ResNet18.
  
 \subsection*{Comparison to prior work}
@@ -431,7 +430,7 @@ The nearest methodological parallel is outside urology altogether. Ruf et al.\ p
  
 \subsection*{Limitations}
  
-A couple limitations are worth mentioning. Firstly, the dataset is small by deep learning standards. With only 414 stones, there is a limit to how well model can learn about the composition of these stones. MAP appears as the dominant mineral in just 12 stones across the whole dataset and CYS in 39, so the test sets for these classes are too small to give stable metrics.
+A couple limitations are worth mentioning. Firstly, the dataset is small by deep learning standards. With only 414 stones, there is a limit to how well the model can learn about the composition of these stones. MAP appears as the dominant mineral in just 12 stones across the whole dataset and CYS in 39, so the test sets for these classes are too small to give stable metrics.
 All the images were taken ex vivo under controlled conditions at a single hospital. In vivo endoscopic images are a much harder problem, with the stone only partly visible, lighting that varies, and blood and tissue in the way, so our results won't carry over to that setting without further work. Using data from one institution also limits how far the composition distribution generalizes, since the patient population and current size of our dataset at Amsterdam UMC may not match the mix of stone types seen elsewhere.
 As training took three to four hours for each model, there was limited time available for tuning. Besides the sweep over the auxiliary loss weight, we did not test alternative backbones, augmentation strategies, or MAE in place of KL divergence as the main regression loss. These are left for future work. Finally, we have no data connecting our composition predictions to actual clinical decisions or patient outcomes, which is also something you would need to show this approach is useful in practice.
  
@@ -480,11 +479,10 @@ The weight $\lambda$ of the auxiliary presence detection loss was selected from 
     \end{tabular}
 \end{table}
 
-\clearpage
 \section{Training and validation loss curves}
 \label{app:losscurves}
 
-\begin{figure*}[t]
+\begin{figure}[ht]
     \centering
     \begin{subfigure}[t]{0.32\textwidth}
         \centering
@@ -503,7 +501,7 @@ The weight $\lambda$ of the auxiliary presence detection loss was selected from 
     \end{subfigure}
     \caption{\textbf{Training and validation loss curves per model.} Mean loss across five cross-validation folds with $\pm$1 standard deviation bands. The vertical dashed line marks the transition from Phase~1 (frozen backbone) to Phase~2 (full fine-tuning). Early stopping is applied in Phase~2; the number of epochs therefore varies across folds.}
     \label{fig:losscurves}
-\end{figure*}
+\end{figure}
 
 \section{Backbone selection: ResNet50 overfitting}
 \label{app:resnet50}
